@@ -1,0 +1,67 @@
+# Python bytecode
+*.py[cod]
+__pycache__/
+*.so
+
+# Virtual environments
+venv/
+*.env
+*.venv
+
+# Easy-Wav2Lip checkpoints and large files
+easy_wav2lip/checkpoints/
+easy_wav2lip/temp/
+
+# Videos and temporary files
+videos/input/
+videos/output/
+temp/
+
+# Logs and debug output
+*.log
+*.out
+*.err
+debug/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDEs and editors
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# Dependencies
+*.egg-info/
+*.egg
+dist/
+build/
+__pycache__/
+
+# Pytest cache
+.pytest_cache/
+.cache/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# macOS specific
+*.DS_Store
+
+# Docker
+docker-compose.override.yml
+.env.local
+
+# Other
+note.text
+gfpgan
+Wav2Lip.pth
+Wav2Lip.pk1
+Wav2Lip_GAN.pth
+Wav2Lip_GAN.pk1
+shape_predictor_68_face_landmarks_GTX.dat
+GFPGANv1.4.pth
+mouth_detector.pkl
+predictor.pkl

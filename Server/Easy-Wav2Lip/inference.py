@@ -493,7 +493,7 @@ def get_smoothened_boxes(boxes, T):
     return boxes
             
 def face_detect(images, results_file="last_detected_face.pkl"):
-    # If results file exists, load it and return
+    # ถ้าเคยตรวจจับใบหน้าแล้ว ให้โหลดผลลัพธ์เก่า
     if os.path.exists(results_file):
         print("Using face detection data from last input")
         with open(results_file, "rb") as f:
@@ -501,22 +501,22 @@ def face_detect(images, results_file="last_detected_face.pkl"):
 
     results = []
     pady1, pady2, padx1, padx2 = args.pads
-    
-    tqdm_partial = partial(tqdm, position=0, leave=True)
-    for image, (rect) in tqdm_partial(
-        zip(images, face_rect(images)),
-        total=len(images),
-        desc="detecting face in every frame",
-        ncols=100,
-    ):
-        if rect is None:
-            cv2.imwrite(
-                "temp/faulty_frame.jpg", image
-            )  # check this frame where the face was not detected.
-            raise ValueError(
-                "Face not detected! Ensure the video contains a face in all the frames."
-            )
+    prev_rect = None  # เก็บ bounding box ของเฟรมก่อนหน้า
 
+    for i, image in enumerate(tqdm(images, desc="detecting face in every frame", ncols=100)):
+        faces = detector([image])  # ตรวจจับใบหน้า
+        if faces[0]:  # ถ้าเจอใบหน้า
+            box, landmarks, score = faces[0][0]
+            rect = tuple(map(int, box))  # แปลง bounding box เป็น int
+            prev_rect = rect  # เก็บ bounding box ของเฟรมนี้
+        else:  # ถ้าไม่เจอใบหน้า
+            print(f"No face detected in frame {i}. Using previous detection.")
+            if prev_rect is None:  # ถ้าก่อนหน้านี้ไม่เคยเจอใบหน้าเลย
+                rect = (0, image.shape[0], 0, image.shape[1])  # ใช้ทั้งภาพ
+            else:
+                rect = prev_rect  # ใช้ bounding box ของเฟรมก่อนหน้า
+
+        # ปรับ padding
         y1 = max(0, rect[1] - pady1)
         y2 = min(image.shape[0], rect[3] + pady2)
         x1 = max(0, rect[0] - padx1)
@@ -524,30 +524,22 @@ def face_detect(images, results_file="last_detected_face.pkl"):
 
         results.append([x1, y1, x2, y2])
 
-
-    boxes = np.array(results)
-    if str(args.nosmooth) == "False":
-        boxes = get_smoothened_boxes(boxes, T=5)
-    results = [
-        [image[y1:y2, x1:x2], (y1, y2, x1, x2)]
-        for image, (x1, y1, x2, y2) in zip(images, boxes)
-    ]
-
-    # Save results to file
+    # บันทึกผลการตรวจจับ
     with open(results_file, "wb") as f:
         pickle.dump(results, f)
 
     return results
 
 
+
 def datagen(frames, mels):
     img_batch, mel_batch, frame_batch, coords_batch = [], [], [], []
-    print("\r" + " " * 100, end="\r")
+
     if args.box[0] == -1:
         if not args.static:
-            face_det_results = face_detect(frames)  # BGR2RGB for CNN face detection
+            face_det_results = face_detect(frames)  # ตรวจจับใบหน้า
         else:
-            face_det_results = face_detect([frames[0]])
+            face_det_results = face_detect([frames[0]])  # Static mode
     else:
         print("Using the specified bounding box instead of face detection...")
         y1, y2, x1, x2 = args.box
@@ -555,6 +547,11 @@ def datagen(frames, mels):
 
     for i, m in enumerate(mels):
         idx = 0 if args.static else i % len(frames)
+
+        if idx >= len(face_det_results):  # ถ้าไม่มี bounding box สำหรับเฟรมนี้
+            print(f"Skipping frame {idx} as no face detected.")
+            continue
+
         frame_to_save = frames[idx].copy()
         face, coords = face_det_results[idx].copy()
 
@@ -591,6 +588,7 @@ def datagen(frames, mels):
         )
 
         yield img_batch, mel_batch, frame_batch, coords_batch
+
 
 
 mel_step_size = 16

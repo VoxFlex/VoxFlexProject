@@ -65,3 +65,19 @@ shape_predictor_68_face_landmarks_GTX.dat
 GFPGANv1.4.pth
 mouth_detector.pkl
 predictor.pkl
+last_detected_face.pkl
+
+# Ignore everything inside the folders
+input/*
+output/*
+temp/*
+
+# But keep the folders themselves
+!input/
+!output/
+!temp/
+
+# Allow specific files for placeholders
+!input/.gitkeep
+!output/.gitkeep
+!temp/.gitkeep

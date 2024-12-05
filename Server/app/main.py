@@ -38,7 +38,7 @@ async def process_video(
     translated_audio_path = f"temp/translated_audio_{file_id}.wav"
     output_video_path = f"output/output_video_{file_id}.mp4"
     compressed_video_path = f"output/compressed_{file_id}.mp4"
-    checkpoint_path = os.path.join("Easy-Wav2Lip", "checkpoints", "wav2lip.pth")
+    checkpoint_path = os.path.join("Easy-Wav2Lip", "checkpoints", "Wav2Lip_GAN.pth")
 
     # Save uploaded video file
     with open(video_path, "wb") as f:

@@ -493,103 +493,100 @@ def get_smoothened_boxes(boxes, T):
     return boxes
             
 def face_detect(images, results_file="last_detected_face.pkl"):
-    # ถ้าเคยตรวจจับใบหน้าแล้ว ให้โหลดผลลัพธ์เก่า
+    """
+    Detect faces in a list of images and return bounding boxes with padding.
+    """
     if os.path.exists(results_file):
-        print("Using face detection data from last input")
+        print("Using cached face detection results.")
         with open(results_file, "rb") as f:
             return pickle.load(f)
 
     results = []
     pady1, pady2, padx1, padx2 = args.pads
-    prev_rect = None  # เก็บ bounding box ของเฟรมก่อนหน้า
+    prev_rect = None  # Store the last valid bounding box
 
-    for i, image in enumerate(tqdm(images, desc="detecting face in every frame", ncols=100)):
-        faces = detector([image])  # ตรวจจับใบหน้า
-        if faces[0]:  # ถ้าเจอใบหน้า
+    for i, image in enumerate(tqdm(images, desc="Detecting faces", ncols=100)):
+        faces = detector([image])  # Detect faces in the current frame
+        if faces[0]:  # Face detected
             box, landmarks, score = faces[0][0]
-            rect = tuple(map(int, box))  # แปลง bounding box เป็น int
-            prev_rect = rect  # เก็บ bounding box ของเฟรมนี้
-        else:  # ถ้าไม่เจอใบหน้า
-            print(f"No face detected in frame {i}. Using previous detection.")
-            if prev_rect is None:  # ถ้าก่อนหน้านี้ไม่เคยเจอใบหน้าเลย
-                rect = (0, image.shape[0], 0, image.shape[1])  # ใช้ทั้งภาพ
+            rect = tuple(map(int, box))
+            prev_rect = rect  # Update last valid bounding box
+        else:  # No face detected
+            print(f"No face detected in frame {i}. Using fallback.")
+            if prev_rect:
+                rect = prev_rect  # Use the previous valid bounding box
             else:
-                rect = prev_rect  # ใช้ bounding box ของเฟรมก่อนหน้า
+                # Fallback to using the entire image
+                rect = (0, image.shape[0], 0, image.shape[1])
 
-        # ปรับ padding
+        # Apply padding to the bounding box
         y1 = max(0, rect[1] - pady1)
         y2 = min(image.shape[0], rect[3] + pady2)
         x1 = max(0, rect[0] - padx1)
         x2 = min(image.shape[1], rect[2] + padx2)
 
-        results.append([x1, y1, x2, y2])
+        # Ensure bounding box is valid
+        if y1 >= y2 or x1 >= x2:
+            print(f"Invalid bounding box for frame {i}: {rect}. Skipping.")
+            results.append(None)  # Mark as invalid
+        else:
+            results.append([x1, y1, x2, y2])
 
-    # บันทึกผลการตรวจจับ
+    # Save results for future use
     with open(results_file, "wb") as f:
         pickle.dump(results, f)
 
     return results
 
-
-
 def datagen(frames, mels):
+    """
+    Generator to yield batches of face crops and corresponding audio Mel spectrograms.
+    """
     img_batch, mel_batch, frame_batch, coords_batch = [], [], [], []
 
-    if args.box[0] == -1:
-        if not args.static:
-            face_det_results = face_detect(frames)  # ตรวจจับใบหน้า
-        else:
-            face_det_results = face_detect([frames[0]])  # Static mode
-    else:
-        print("Using the specified bounding box instead of face detection...")
-        y1, y2, x1, x2 = args.box
-        face_det_results = [[f[y1:y2, x1:x2], (y1, y2, x1, x2)] for f in frames]
+    # Get face detection results
+    face_det_results = face_detect(frames)
 
     for i, m in enumerate(mels):
         idx = 0 if args.static else i % len(frames)
 
-        if idx >= len(face_det_results):  # ถ้าไม่มี bounding box สำหรับเฟรมนี้
-            print(f"Skipping frame {idx} as no face detected.")
+        # Skip invalid face detection results
+        if not face_det_results[idx]:
+            print(f"Skipping frame {idx} due to invalid face detection.")
             continue
 
-        frame_to_save = frames[idx].copy()
-        face, coords = face_det_results[idx].copy()
+        x1, y1, x2, y2 = face_det_results[idx]
+        face = frames[idx][y1:y2, x1:x2]  # Crop face region
 
+        # Resize face to model input size
         face = cv2.resize(face, (args.img_size, args.img_size))
 
         img_batch.append(face)
         mel_batch.append(m)
-        frame_batch.append(frame_to_save)
-        coords_batch.append(coords)
+        frame_batch.append(frames[idx])
+        coords_batch.append((x1, y1, x2, y2))
 
+        # Yield a batch when enough data is collected
         if len(img_batch) >= args.wav2lip_batch_size:
-            img_batch, mel_batch = np.asarray(img_batch), np.asarray(mel_batch)
-
-            img_masked = img_batch.copy()
-            img_masked[:, args.img_size // 2 :] = 0
-
-            img_batch = np.concatenate((img_masked, img_batch), axis=3) / 255.0
-            mel_batch = np.reshape(
-                mel_batch, [len(mel_batch), mel_batch.shape[1], mel_batch.shape[2], 1]
-            )
-
+            img_batch, mel_batch = prepare_batch(img_batch, mel_batch)
             yield img_batch, mel_batch, frame_batch, coords_batch
             img_batch, mel_batch, frame_batch, coords_batch = [], [], [], []
 
-    if len(img_batch) > 0:
-        img_batch, mel_batch = np.asarray(img_batch), np.asarray(mel_batch)
-
-        img_masked = img_batch.copy()
-        img_masked[:, args.img_size // 2 :] = 0
-
-        img_batch = np.concatenate((img_masked, img_batch), axis=3) / 255.0
-        mel_batch = np.reshape(
-            mel_batch, [len(mel_batch), mel_batch.shape[1], mel_batch.shape[2], 1]
-        )
-
+    # Yield remaining data
+    if img_batch:
+        img_batch, mel_batch = prepare_batch(img_batch, mel_batch)
         yield img_batch, mel_batch, frame_batch, coords_batch
 
 
+def prepare_batch(img_batch, mel_batch):
+    """
+    Prepare image and mel batches for the model.
+    """
+    img_batch = np.asarray(img_batch) / 255.0
+    mel_batch = np.asarray(mel_batch)
+    img_batch = np.transpose(img_batch, (0, 3, 1, 2))
+    mel_batch = np.reshape(mel_batch, [len(mel_batch), mel_batch.shape[1], mel_batch.shape[2], 1])
+    return img_batch, mel_batch
 
 mel_step_size = 16
 
@@ -603,54 +600,49 @@ def _load(checkpoint_path):
     return checkpoint
 
 
+import os
+
 def main():
     args.img_size = 96
-    frame_number = 11
 
-    if os.path.isfile(args.face) and args.face.split(".")[1] in ["jpg", "png", "jpeg"]:
-        args.static = True
+    # ลบไฟล์ชั่วคราวก่อนเริ่มกระบวนการ
+    temp_dir = "temp"
+    output_video_path = os.path.join(temp_dir, "result.mp4")
+    if os.path.exists(output_video_path):
+        os.remove(output_video_path)
+    if os.path.exists("last_detected_face.pkl"):
+        os.remove("last_detected_face.pkl")
 
+    # ตรวจสอบว่า input file (face) มีอยู่จริง
     if not os.path.isfile(args.face):
         raise ValueError("--face argument must be a valid path to video/image file")
 
-    elif args.face.split(".")[1] in ["jpg", "png", "jpeg"]:
+    # อ่านเฟรมจากไฟล์ (รูปภาพหรือวิดีโอ)
+    if args.face.split(".")[1] in ["jpg", "png", "jpeg"]:
+        args.static = True
         full_frames = [cv2.imread(args.face)]
         fps = args.fps
-
     else:
-        if args.fullres != 1:
-            print("Resizing video...")
         video_stream = cv2.VideoCapture(args.face)
         fps = video_stream.get(cv2.CAP_PROP_FPS)
-
         full_frames = []
-        while 1:
+        while True:
             still_reading, frame = video_stream.read()
             if not still_reading:
                 video_stream.release()
                 break
-
             if args.fullres != 1:
                 aspect_ratio = frame.shape[1] / frame.shape[0]
                 frame = cv2.resize(
                     frame, (int(args.out_height * aspect_ratio), args.out_height)
                 )
-
-            if args.rotate:
-                frame = cv2.rotate(frame, cv2.cv2.ROTATE_90_CLOCKWISE)
-
-            y1, y2, x1, x2 = args.crop
-            if x2 == -1:
-                x2 = frame.shape[1]
-            if y2 == -1:
-                y2 = frame.shape[0]
-
-            frame = frame[y1:y2, x1:x2]
-
             full_frames.append(frame)
 
+    # ตรวจสอบไฟล์เสียงและแปลงเป็น WAV หากจำเป็น
     if not args.audio.endswith(".wav"):
         print("Converting audio to .wav")
+        os.makedirs(temp_dir, exist_ok=True)
+        wav_path = os.path.join(temp_dir, "temp.wav")
         subprocess.check_call(
             [
                 "ffmpeg",
@@ -659,143 +651,75 @@ def main():
                 "error",
                 "-i",
                 args.audio,
-                "temp/temp.wav",
+                wav_path,
             ]
         )
-        args.audio = "temp/temp.wav"
+        args.audio = wav_path
 
-    print("analysing audio...")
+    # วิเคราะห์เสียงและสร้าง Mel Spectrogram
+    print("Analyzing audio...")
     wav = audio.load_wav(args.audio, 16000)
     mel = audio.melspectrogram(wav)
-
     if np.isnan(mel.reshape(-1)).sum() > 0:
-        raise ValueError(
-            "Mel contains nan! Using a TTS voice? Add a small epsilon noise to the wav file and try again"
-        )
+        raise ValueError("Mel contains NaN! Please check your audio file.")
 
+    # สร้าง Mel chunks
     mel_chunks = []
-
     mel_idx_multiplier = 80.0 / fps
     i = 0
-    while 1:
+    while True:
         start_idx = int(i * mel_idx_multiplier)
         if start_idx + mel_step_size > len(mel[0]):
-            mel_chunks.append(mel[:, len(mel[0]) - mel_step_size :])
+            mel_chunks.append(mel[:, len(mel[0]) - mel_step_size:])
             break
-        mel_chunks.append(mel[:, start_idx : start_idx + mel_step_size])
+        mel_chunks.append(mel[:, start_idx: start_idx + mel_step_size])
         i += 1
 
-    full_frames = full_frames[: len(mel_chunks)]
-    if str(args.preview_settings) == "True":
-        full_frames = [full_frames[0]]
-        mel_chunks = [mel_chunks[0]]
-    print(str(len(full_frames)) + " frames to process")
-    batch_size = args.wav2lip_batch_size
-    if str(args.preview_settings) == "True":
-        gen = datagen(full_frames, mel_chunks)
-    else:
-        gen = datagen(full_frames.copy(), mel_chunks)
+    # จำกัดจำนวนเฟรมตาม Mel chunks
+    full_frames = full_frames[:len(mel_chunks)]
 
+    # ตรวจสอบว่ามีเฟรมและ Mel chunks ให้ประมวลผล
+    if len(full_frames) == 0 or len(mel_chunks) == 0:
+        raise ValueError("No frames or Mel chunks available for processing.")
+
+    # เขียนวิดีโอ
+    out = None
     for i, (img_batch, mel_batch, frames, coords) in enumerate(
-        tqdm(
-            gen,
-            total=int(np.ceil(float(len(mel_chunks)) / batch_size)),
-            desc="Processing Wav2Lip",
-            ncols=100,
-        )
+        datagen(full_frames, mel_chunks)
     ):
         if i == 0:
-            if not args.quality == "Fast":
-                print(
-                    f"mask size: {args.mask_dilation}, feathering: {args.mask_feathering}"
-                )
-                if not args.quality == "Improved":
-                    print("Loading", args.sr_model)
-                    run_params = load_sr()
-
-            print("Starting...")
             frame_h, frame_w = full_frames[0].shape[:-1]
             fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-            out = cv2.VideoWriter("temp/result.mp4", fourcc, fps, (frame_w, frame_h))
+            out = cv2.VideoWriter(output_video_path, fourcc, fps, (frame_w, frame_h))
 
-        img_batch = torch.FloatTensor(np.transpose(img_batch, (0, 3, 1, 2))).to(device)
-        mel_batch = torch.FloatTensor(np.transpose(mel_batch, (0, 3, 1, 2))).to(device)
+        for frame in frames:
+            out.write(frame)
 
-        with torch.no_grad():
-            pred = model(mel_batch, img_batch)
+    # ปิด VideoWriter
+    if out is not None:
+        out.release()
+        print(f"Intermediate video saved to {output_video_path}")
 
-        pred = pred.cpu().numpy().transpose(0, 2, 3, 1) * 255.0
+    # ตรวจสอบว่าไฟล์วิดีโอถูกสร้างสำเร็จ
+    if not os.path.exists(output_video_path):
+        raise FileNotFoundError(f"Output video file not found: {output_video_path}")
 
-        for p, f, c in zip(pred, frames, coords):
-            # cv2.imwrite('temp/f.jpg', f)
-
-            y1, y2, x1, x2 = c
-
-            if (
-                str(args.debug_mask) == "True"
-            ):  # makes the background black & white so you can see the mask better
-                f = cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
-                f = cv2.cvtColor(f, cv2.COLOR_GRAY2BGR)
-
-            p = cv2.resize(p.astype(np.uint8), (x2 - x1, y2 - y1))
-            cf = f[y1:y2, x1:x2]
-
-            if args.quality == "Enhanced":
-                p = upscale(p, run_params)
-
-            if args.quality in ["Enhanced", "Improved"]:
-                if str(args.mouth_tracking) == "True":
-                    p, last_mask = create_tracked_mask(p, cf)
-                else:
-                    p, last_mask = create_mask(p, cf)
-
-            f[y1:y2, x1:x2] = p
-
-            if not g_colab:
-                # Display the frame
-                if preview_window == "Face":
-                    cv2.imshow("face preview - press Q to abort", p)
-                elif preview_window == "Full":
-                    cv2.imshow("full preview - press Q to abort", f)
-                elif preview_window == "Both":
-                    cv2.imshow("face preview - press Q to abort", p)
-                    cv2.imshow("full preview - press Q to abort", f)
-
-                key = cv2.waitKey(1) & 0xFF
-                if key == ord('q'):
-                    exit()  # Exit the loop when 'Q' is pressed
-
-            if str(args.preview_settings) == "True":
-                cv2.imwrite("temp/preview.jpg", f)
-                if not g_colab:
-                    cv2.imshow("preview - press Q to close", f)
-                    if cv2.waitKey(-1) & 0xFF == ord('q'):
-                        exit()  # Exit the loop when 'Q' is pressed
-
-            else:
-                out.write(f)
-
-    # Close the window(s) when done
-    cv2.destroyAllWindows()
-
-    out.release()
-
-    if str(args.preview_settings) == "False":
-        print("converting to final video")
-
-        subprocess.check_call([
-            "ffmpeg",
-            "-y",
-            "-loglevel",
-            "error",
-            "-i",
-            "temp/result.mp4",
-            "-i",
-            args.audio,
-            "-c:v",
-            "libx264",
-            args.outfile
-        ])
+    # รวมไฟล์วิดีโอและเสียงด้วย ffmpeg
+    final_video_path = args.outfile
+    subprocess.check_call([
+        "ffmpeg",
+        "-y",
+        "-loglevel",
+        "error",
+        "-i",
+        output_video_path,
+        "-i",
+        args.audio,
+        "-c:v",
+        "libx264",
+        final_video_path
+    ])
+    print(f"Final video saved to {final_video_path}")
 
 if __name__ == "__main__":
     args = parser.parse_args()

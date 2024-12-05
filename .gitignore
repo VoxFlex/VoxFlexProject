@@ -53,15 +53,3 @@ __pycache__/
 # Docker
 docker-compose.override.yml
 .env.local
-
-# Other
-note.text
-gfpgan
-Wav2Lip.pth
-Wav2Lip.pk1
-Wav2Lip_GAN.pth
-Wav2Lip_GAN.pk1
-shape_predictor_68_face_landmarks_GTX.dat
-GFPGANv1.4.pth
-mouth_detector.pkl
-predictor.pkl

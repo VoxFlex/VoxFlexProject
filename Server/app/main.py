@@ -1,6 +1,7 @@
+from .utils.tts_generation_with_sync import generate_speech_with_sync
 from .utils.video_processing import convert_video_to_audio
 from .utils.transcription_translation import transcribe_and_translate
-from .utils.tts_generation import generate_speech_from_text_gtts
+# from .utils.tts_generation import generate_speech_from_text_gtts
 from .utils.sync_audio_to_video import run_inference
 from fastapi import FastAPI, UploadFile, Form
 from fastapi.responses import FileResponse
@@ -38,7 +39,8 @@ async def process_video(
     translated_audio_path = f"temp/translated_audio_{file_id}.wav"
     output_video_path = f"output/output_video_{file_id}.mp4"
     compressed_video_path = f"output/compressed_{file_id}.mp4"
-    checkpoint_path = os.path.join("Easy-Wav2Lip", "checkpoints", "Wav2Lip_GAN.pth")
+    checkpoint_path = os.path.join("Easy-Wav2Lip", "checkpoints", "Wav2Lip.pth")
+
 
     # Save uploaded video file
     with open(video_path, "wb") as f:
@@ -49,10 +51,13 @@ async def process_video(
         convert_video_to_audio(video_path, audio_path)
 
         # Step 2: Transcribe and translate audio
-        translated_text = transcribe_and_translate(audio_path, source_language="en", target_language=target_language)
+        translated_text,segments = transcribe_and_translate(audio_path, source_language="en", target_language=target_language)
 
         # Step 3: Generate speech from translated text
-        generate_speech_from_text_gtts(translated_text, translated_audio_path)
+        # generate_speech_from_text_gtts(translated_text, translated_audio_path,target_language)
+        
+        # Step 3: Generate speech from translated text with sync
+        generate_speech_with_sync(segments, translated_audio_path, target_language)
 
         # Step 4: Run Wav2Lip inference
         run_inference(video_path, translated_audio_path, output_video_path, checkpoint_path)
@@ -68,6 +73,9 @@ async def process_video(
         )
 
     except Exception as e:
+        for file_path in [video_path, audio_path, translated_audio_path, output_video_path]:
+            if os.path.exists(file_path):
+                os.remove(file_path)        
         return {"error": str(e)}
 
     finally:

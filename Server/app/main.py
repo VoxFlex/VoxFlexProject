@@ -6,11 +6,19 @@ from .utils.sync_audio_to_video import run_inference
 from fastapi import FastAPI, UploadFile, Form
 from fastapi.responses import FileResponse
 from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
 import os
 import uuid
 import subprocess
 
-app = FastAPI()
+app = FastAPI(debug=True)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Allow your frontend's origin
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
+)
 
 def compress_video(input_path, output_path):
     """Compress the video using ffmpeg to reduce size."""
@@ -96,3 +104,6 @@ async def download_file(file_name: str):
 @app.get("/")
 async def root():
     return {"message": "Welcome to the Video Processing API"}
+
+
+#  python inference.py --checkpoint_path "Wav2Lip.pth" --face "../temp/result.mp4" --audio "../temp/translated_audio_00c591ed-bd2a-424a-9546-44bc247a3828.wav"  --outfile "output/output_video/demoVideo1.mp4"

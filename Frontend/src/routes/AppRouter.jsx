@@ -1,8 +1,9 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
-import Translate from "../pages/Translate";
+
 import About from "../pages/About";
+import AiStudio from "../pages/AIStudio";
 
 const AppRouter = () => {
   return (
@@ -11,7 +12,7 @@ const AppRouter = () => {
       <Route path="/" element={<Home />} />
 
       {/* Translate route */}
-      <Route path="translate" element={<Translate />} />
+      <Route path="translate" element={<AiStudio/>} />
 
       {/* About route */}
       <Route path="about" element={<About />} />

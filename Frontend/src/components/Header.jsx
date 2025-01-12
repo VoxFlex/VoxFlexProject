@@ -5,12 +5,12 @@ const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-  // Update windowWidth state on resize
+  // อัพเดตขนาดหน้าจอเมื่อมีการเปลี่ยนแปลง
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
 
-    // Cleanup event listener on unmount
+    // ลบ event listener เมื่อ component ถูก unmount
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
@@ -21,55 +21,72 @@ const Header = () => {
   return (
     <header
       style={{
-        backgroundColor: "#333",
-        color: "#fff",
-        padding: "5px 3% 5px",
-        width: "94%",
+        backgroundColor: "#fff",
+        padding: "1rem 0",
+        width: "100%",
+        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.06)",
+        position: "sticky", // ใช้ sticky position เพื่อให้ Navbar ติดตามเมื่อ scroll
+        top: 0, // ระบุให้ติดอยู่ด้านบนสุด
+        zIndex: 1000, // เพิ่มความสำคัญให้ Navbar อยู่เหนือ content อื่น ๆ
       }}
     >
       <nav
         style={{
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: "center", // จัดให้อยู่ตรงกลางทั้งลิงก์
           alignItems: "center",
+          height: "3rem",
+          position: "relative", // เพื่อให้ logo ใช้ position:absolute ได้
+          justifyContent: windowWidth < 600 ? "flex-end" : "center", // ใช้ flex-end หากหน้าจอเล็ก
         }}
       >
-        {/* Logo */}
-        <h2 style={{ margin: 0 , fontSize: 34}}>VoxFlex</h2>
+        {/* โลโก้ */}
+        <img
+          src="../../image/voxflex_icon.svg"
+          alt="VoxFlex Icon"
+          style={{
+            width: windowWidth >= 600 ? "50%" : "28%", // เปลี่ยนขนาดตามความกว้างหน้าจอ
+            maxWidth: "180px", // จำกัดขนาดสูงสุด
+            height: "auto", // ให้คงอัตราส่วนภาพ
+            position: "absolute", // แยกโลโก้ออกจากการจัดวาง
+            left: "2rem", // ตำแหน่งห่างจากขอบซ้าย
+            top: "50%",
+            transform: "translateY(-50%)", // จัดให้อยู่ตรงกลางแนวตั้ง
+          }}
+        />
 
-        {/* Desktop Links */}
-        {windowWidth >= 400 ? (
+        {/* ลิงก์สำหรับ Desktop */}
+        {windowWidth >= 600 ? (
           <div
-            className="nav-links"
             style={{
               display: "flex",
+              gap: "3rem", // ช่องว่างระหว่างลิงก์
+              justifyContent: "center",
+              fontSize: "1rem",
             }}
           >
             <Link
               to="/"
               style={{
-                margin: "0 15px",
-                color: "white",
+                color: "#333",
                 textDecoration: "none",
               }}
             >
               Home
             </Link>
             <Link
-              to="/translate"
+              to="/ai_studio"
               style={{
-                margin: "0 15px",
-                color: "white",
+                color: "#333",
                 textDecoration: "none",
               }}
             >
-              Translate
+              Ai Studio
             </Link>
             <Link
               to="/about"
               style={{
-                margin: "0 15px",
-                color: "white",
+                color: "#333",
                 textDecoration: "none",
               }}
             >
@@ -77,12 +94,12 @@ const Header = () => {
             </Link>
           </div>
         ) : (
-          // Dropdown Toggle Button for Small Screens
+          // ปุ่ม Dropdown สำหรับหน้าจอขนาดเล็ก
           <button
             onClick={toggleDropdown}
             style={{
               backgroundColor: "transparent",
-              color: "white",
+              color: "black",
               border: "none",
               cursor: "pointer",
               fontSize: "1.5rem",
@@ -93,10 +110,9 @@ const Header = () => {
         )}
       </nav>
 
-      {/* Dropdown Menu */}
+      {/* เมนู Dropdown */}
       {isDropdownOpen && windowWidth < 400 && (
         <div
-          className="dropdown-menu"
           style={{
             display: "flex",
             flexDirection: "column",
@@ -118,7 +134,7 @@ const Header = () => {
             Home
           </Link>
           <Link
-            to="/translate"
+            to="/ai_studio"
             onClick={() => setIsDropdownOpen(false)}
             style={{
               margin: "5px 0",
@@ -127,7 +143,7 @@ const Header = () => {
               textAlign: "center",
             }}
           >
-            Translate
+            Ai Studio
           </Link>
           <Link
             to="/about"

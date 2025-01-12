@@ -68,12 +68,12 @@
   }
 }
 
-footer {
-  background: rgb(55, 61, 55);
-  position: fixed;
-  width: 100%;
-  bottom: 0;
-  color: white;
-  text-align: center;
-  
+.main-content {
+  flex: 1; /* Fills the remaining space between header and footer */
+  /* padding: 2rem; Add some spacing */
+}
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Full height for the app container */
 }

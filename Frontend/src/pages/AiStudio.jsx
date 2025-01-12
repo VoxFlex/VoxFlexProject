@@ -40,7 +40,7 @@ const AiStudio = () => {
         flexGrow: 1,
         maxWidth: "90vw",
         margin: "0 auto",
-        minHeight: "90vh",
+        minHeight: "70vh",
         marginTop: 6
       }}
     >

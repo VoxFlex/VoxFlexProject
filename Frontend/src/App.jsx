@@ -5,13 +5,13 @@ import AppRouter from "./routes/AppRouter";
 import "./App.css";
 import AppAppBar from "./components/AppBar";
 
+
 const App = () => {
   return (
     <div className="app-container">
       <Header />
-      {/* <AppAppBar /> */}
       {/* Main content area stretches to fill remaining space */}
-      <main>
+      <main className="main-content">
         <AppRouter />
       </main>
       <Footer />

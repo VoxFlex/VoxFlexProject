@@ -12,7 +12,7 @@ const AppRouter = () => {
       <Route path="/" element={<Home />} />
 
       {/* Translate route */}
-      <Route path="translate" element={<AiStudio/>} />
+      <Route path="/ai_studio" element={<AiStudio/>} />
 
       {/* About route */}
       <Route path="about" element={<About />} />

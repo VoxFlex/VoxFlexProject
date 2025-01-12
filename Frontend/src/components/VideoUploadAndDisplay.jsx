@@ -20,10 +20,12 @@ const VideoUploadAndDisplay = ({
         border: "2px dashed #ccc",
         padding: 3,
         borderRadius: 2,
-        marginBottom: 2,
         textAlign: "center",
         minHeight: "50vh",
         backgroundColor: "#f9f9f9",
+        display: "flex", // Ensures parent uses flexbox
+        justifyContent: "center", // Horizontally center content
+        alignItems: "center", // Vertically center content
       }}
     >
       {isUploading ? (
@@ -33,6 +35,8 @@ const VideoUploadAndDisplay = ({
             justifyContent: "center",
             alignItems: "center",
             height: "100%",
+            margin:"0 auto",
+            display: "content"
           }}
         >
           <CircularProgress />
@@ -66,6 +70,7 @@ const VideoUploadAndDisplay = ({
             width: "100%",
             maxHeight: "50vh", // Limit height to avoid overflow
             overflow: "hidden",
+            display: "contents",
           }}
         >
           <video
@@ -73,8 +78,8 @@ const VideoUploadAndDisplay = ({
             style={{
               borderRadius: "8px",
               backgroundColor: "#000",
-              maxWidth: "100%", // Ensure it doesn't exceed container width
-              maxHeight: "100%", // Ensure it doesn't exceed container height
+              maxWidth: "100%", 
+              maxHeight: "100%",
             }}
           >
             <source src={apiVideoUrl} type="video/mp4" />

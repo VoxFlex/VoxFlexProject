@@ -2,7 +2,14 @@ import React, { useRef } from "react";
 import DownloadIcon from "@mui/icons-material/Download";
 import AddIcon from "@mui/icons-material/Add";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { Box, Typography, MenuItem, Select, Button, FormControl } from "@mui/material";
+import {
+  Box,
+  Typography,
+  MenuItem,
+  Select,
+  Button,
+  FormControl,
+} from "@mui/material";
 
 const VideoTranslationSetting = ({
   originalLanguage,
@@ -39,7 +46,7 @@ const VideoTranslationSetting = ({
   };
 
   return (
-    <Box sx={{ minHeight: "30vh" }}>
+    <Box sx={{ minHeight: "15rem" }}>
       <Typography variant="subtitle1" gutterBottom>
         Original Language
       </Typography>
@@ -48,9 +55,16 @@ const VideoTranslationSetting = ({
           displayEmpty
           value={originalLanguage}
           onChange={(e) => setOriginalLanguage(e.target.value)}
-          renderValue={(selected) =>
-            selected || "Select Language (Default Voice Detection)"
-          }
+          renderValue={(selected) => {
+            if (!selected) return "Select Language (Default Voice Detection)";
+            const languageMap = {
+              th: "Thai",
+              en: "English",
+              fr: "French",
+              de: "German",
+            };
+            return languageMap[selected] || selected;
+          }}
         >
           <MenuItem value="Voice Detection">Voice Detection</MenuItem>
           <MenuItem value="Thai">Thai</MenuItem>
@@ -67,7 +81,17 @@ const VideoTranslationSetting = ({
           displayEmpty
           value={translateTo}
           onChange={(e) => setTranslateTo(e.target.value)}
-          renderValue={(selected) => selected || "Select Language"}
+          renderValue={(selected) => {
+            if (!selected) return "Select Language (Default Thai)";
+            // Map the value to the display label
+            const languageMap = {
+              th: "Thai",
+              en: "English",
+              fr: "French",
+              de: "German",
+            };
+            return languageMap[selected] || selected;
+          }}
         >
           <MenuItem value="th">Thai</MenuItem>
           <MenuItem value="en">English</MenuItem>

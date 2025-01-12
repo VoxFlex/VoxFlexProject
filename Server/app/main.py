@@ -59,7 +59,7 @@ async def process_video(
         convert_video_to_audio(video_path, audio_path)
 
         # Step 2: Transcribe and translate audio
-        translated_text,segments = transcribe_and_translate(audio_path, source_language="en", target_language=target_language)
+        segments = transcribe_and_translate(audio_path, source_language="en", target_language=target_language)
 
         # Step 3: Generate speech from translated text
         # generate_speech_from_text_gtts(translated_text, translated_audio_path,target_language)

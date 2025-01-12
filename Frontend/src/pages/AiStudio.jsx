@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Typography, Grid2 } from "@mui/material";
 import VideoTranslationSetting from "../components/VideoTranslationSetting";
 import VideoUploadAndDisplay from "../components/VideoUploadAndDisplay";
@@ -11,6 +11,15 @@ const AiStudio = () => {
   const [processedVideoUrl, setProcessedVideoUrl] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState(null);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+
+    // ลบ event listener เมื่อ component ถูก unmount
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleFileChange = async (file) => {
     setSelectedFile(file);
@@ -41,16 +50,16 @@ const AiStudio = () => {
         maxWidth: "90vw",
         margin: "0 auto",
         minHeight: "70vh",
-        marginTop: 6
+        marginTop: 6,
       }}
     >
-      {/* <Typography
-        variant="h6"
-        sx={{ marginBottom: 3, fontWeight: "bold", color: "#333" }}
+      <Grid2
+        container
+        spacing={2}
+        sx={{
+          flexDirection: windowWidth >= 600 ? "row" : "column",
+        }}
       >
-        AI Studio &gt;
-      </Typography> */}
-      <Grid2 container spacing={2}>
         {/* Left Section: Video Translation */}
         <Grid2 xs={12} md={6} size="grow">
           <Box
@@ -93,6 +102,7 @@ const AiStudio = () => {
               backgroundColor: "#fff",
               borderRadius: 2,
               boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+              marginBottom: 5,
             }}
           >
             <Typography

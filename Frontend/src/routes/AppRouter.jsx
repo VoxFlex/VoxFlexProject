@@ -1,22 +1,25 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
-import Home from "../pages/Home";
 
-import About from "../pages/About";
-import AiStudio from "../pages/AIStudio";
+// Lazy loading components
+const Home = lazy(() => import("../pages/Home"));
+const About = lazy(() => import("../pages/About"));
+const AiStudio = lazy(() => import("../pages/AIStudio"));
 
 const AppRouter = () => {
   return (
-    <Routes>
-      {/* Root route */}
-      <Route path="/" element={<Home />} />
+    <Suspense fallback={<div>Loading...</div>}>
+      <Routes>
+        {/* Root route */}
+        <Route path="/" element={<Home />} />
 
-      {/* Translate route */}
-      <Route path="/ai_studio" element={<AiStudio/>} />
+        {/* Translate route */}
+        <Route path="/ai_studio" element={<AiStudio />} />
 
-      {/* About route */}
-      <Route path="about" element={<About />} />
-    </Routes>
+        {/* About route */}
+        <Route path="about" element={<About />} />
+      </Routes>
+    </Suspense>
   );
 };
 

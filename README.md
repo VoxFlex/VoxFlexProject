@@ -3,7 +3,10 @@
 VoxFlex is a cutting-edge platform designed to make multimedia content accessible across multiple languages through advanced AI-powered tools. The platform focuses on delivering synchronized, translated, and lip-synced audio and video, offering an immersive and inclusive multimedia experience.
 ## Screenshots
 ### Homepage
-![image](https://github.com/VoxFlex/VoxFlex/blob/main/image_readme/homepage.gif)
+![homepage](https://github.com/user-attachments/assets/4911451a-7515-4e5f-8710-0dbf21bb9de0)
+
+
+
 > [!NOTE] 
 > Our website is fully responsive and adapts seamlessly to any device, including desktops, tablets or mobiles.
 ### AI Studio  

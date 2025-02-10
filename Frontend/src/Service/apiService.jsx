@@ -15,7 +15,7 @@ export const uploadVideoToServer = async (videoFile, targetLanguage = "th") => {
   try {
     // Post form data to the server
     const response = await axios.post(
-      "http://127.0.0.1:8000/process-video/",
+      "http://localhost:8000/video/process/",
       formData,
       {
         headers: {

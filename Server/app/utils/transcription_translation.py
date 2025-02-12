@@ -22,6 +22,28 @@ def convert_numbers_to_words(text, lang="th"):
         return num2words(int(number), lang=lang)
 
     return re.sub(r'\b\d+\b', replace_number, text)
+
+def detect_language(text):
+    """ ตรวจสอบภาษาของข้อความด้วย GPT-4o """
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "You are a language detection expert. Identify the language of the following text and return only the language code (e.g., 'en' for English, 'th' for Thai, 'es' for Spanish)."},
+            {"role": "user", "content": text}
+        ]
+    )
+    return response.choices[0].message.content.strip().lower()
+
+def translate_with_gpt(text, source_lang, target_lang):
+    """ใช้ GPT-4o แปลข้อความหาก Google Translate แปลผิดภาษา"""
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": f"You are a professional translator. Translate the following text from {source_lang} to {target_lang}."},
+            {"role": "user", "content": text}
+        ]
+    )
+    return response.choices[0].message.content.strip()
 def refine_translation_with_gpt(text, segment_duration, previous_context=None, target_language="th"):
     """ใช้ GPT-4o เพื่อปรับคำแปลให้สั้นลง ตามเวลาที่กำหนด โดยไม่เปลี่ยนภาษา"""
     text = convert_numbers_to_words(text, lang=target_language)
@@ -92,14 +114,24 @@ def transcribe_and_translate(audio_path, source_language="en", target_language="
         text_en = seg["text"].strip()
         segment_duration = seg["end"] - seg["start"]  # คำนวณความยาว segment เป็นวินาที
 
-        # Translate to target language
+        # ✅ ใช้ Google Translate แปลก่อน
         translated_text = translator.translate(text_en)
+        print(f"🔹 Google Translate: {translated_text}")
+        
+        # ✅ ตรวจสอบภาษาหลังแปล
+        detected_translated_lang = detect_language(translated_text)
+        print(f"🔍 Detected language after translation: {detected_translated_lang}")
 
-        # ปรับคำแปลให้กระชับ
+        if detected_translated_lang != target_language:
+            print(f"⚠️ Google Translate failed! Using GPT-4o for translation.")
+            translated_text = translate_with_gpt(text_en, source_language, target_language)  # ✅ ใช้ GPT-4o แปลแทน
+            print(f"✅ GPT-4o Translation: {translated_text}")
+        
+        # ✅ ปรับคำแปลให้กระชับ
         refined_text = refine_translation_with_gpt(translated_text, segment_duration, previous_context, target_language)
         refined_text = convert_numbers_to_words(refined_text, lang=target_language)
         
-         # อัปเดต context
+        # ✅ อัปเดต context
         previous_context.append(refined_text)
         if len(previous_context) > 2:
             previous_context.pop(0)

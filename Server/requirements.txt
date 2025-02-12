@@ -11,4 +11,5 @@ whisperx
 openai
 transformers
 torch
+python-dotenv
 # !pip install -r requirements.txt --use-deprecated=legacy-resolver

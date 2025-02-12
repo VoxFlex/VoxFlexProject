@@ -49,21 +49,21 @@ class VideoService:
             generate_speech_with_sync(segments, paths["translated_audio"], target_language)
             print(f"Translated audio saved at: {paths['translated_audio']}")
 
-            run_inference(
-                video_path=paths["video"],
-                audio_path=paths["translated_audio"],
-                output_path=paths["output_video"],
-                checkpoint_path=os.path.join(base_dir, "../../Easy-Wav2Lip/checkpoints/Wav2Lip.pth"),
-            )
+            # run_inference(
+            #     video_path=paths["video"],
+            #     audio_path=paths["translated_audio"],
+            #     output_path=paths["output_video"],
+            #     checkpoint_path=os.path.join(base_dir, "../../Easy-Wav2Lip/checkpoints/Wav2Lip.pth"),
+            # )
             
             # Step 5: Combine translated audio with video without audio
-            # combine_video_and_audio(
-            #     video_no_audio_path=paths["no_audio_video"],
-            #     translated_audio_path=paths["translated_audio"],
-            #     output_video_path=paths["output_video"]
-            # )
+            combine_video_and_audio(
+                video_no_audio_path=paths["no_audio_video"],
+                translated_audio_path=paths["translated_audio"],
+                output_video_path=paths["output_video"]
+            )
 
-            print(f"Inference completed. Output video at: {paths['output_video']}")
+            # print(f"Inference completed. Output video at: {paths['output_video']}")
             
             # Step 6: Compress the final output video
             compress_video(paths["output_video"], paths["compressed_video"])
@@ -80,5 +80,4 @@ class VideoService:
             raise
         
         finally:
-            print("yoo")
             cleanup_files(list(paths.values()), exclude=paths["compressed_video"])

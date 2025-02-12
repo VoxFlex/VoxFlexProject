@@ -50,6 +50,18 @@ VoxFlex is a cutting-edge platform designed to make multimedia content accessibl
    cd voxflex
    ```
 3. Install backend dependencies:
+   - please make sure you have `ffmpeg`
+   ```bash
+   cd server
+   ```
+   ```bash
+   python -m venv .env 
+   ```
+   ```bash
+   .env\Scripts\activate 
+   ```
+   - note: exit .env use `deactivate`
+   
    ```bash
    pip install -r requirements.txt
    ```

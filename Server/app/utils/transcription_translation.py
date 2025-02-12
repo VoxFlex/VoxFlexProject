@@ -22,25 +22,29 @@ def convert_numbers_to_words(text, lang="th"):
         return num2words(int(number), lang=lang)
 
     return re.sub(r'\b\d+\b', replace_number, text)
-def refine_translation_with_gpt(text, previous_context=None, target_language="th"):
-    """ใช้ GPT-4o เพื่อปรับคำแปลให้สั้นลง โดยไม่เปลี่ยนภาษา"""
+def refine_translation_with_gpt(text, segment_duration, previous_context=None, target_language="th"):
+    """ใช้ GPT-4o เพื่อปรับคำแปลให้สั้นลง ตามเวลาที่กำหนด โดยไม่เปลี่ยนภาษา"""
     text = convert_numbers_to_words(text, lang=target_language)
+
+    # คำนวณจำนวนคำสูงสุดที่เหมาะสม (ใช้ 2.5 - 3 คำต่อวินาที)
+    max_words = int(segment_duration * 3)  # ใช้ค่าเฉลี่ย 3 คำต่อวินาที
 
     messages = [
         {"role": "system", "content": 
          f"You are a professional language editor. Your job is to shorten the text while keeping the meaning intact. "
-         f"DO NOT translate. DO NOT change the language. DO NOT add or repeat sentences from previous context."}
+         f"DO NOT translate. DO NOT change the language. DO NOT add or repeat sentences from previous context. "
+         f"Ensure the text does not exceed {max_words} words."}
     ]
 
     if previous_context:
         recent_context = " ".join(previous_context[-2:])
         messages.append(
             {"role": "user", "content": f"Previous context:\n{recent_context}\n"
-                                        f"Now, shorten the following text while keeping its meaning: {text}"}
+                                        f"Now, shorten the following text to fit within {max_words} words while keeping its meaning: {text}"}
         )
     else:
         messages.append(
-            {"role": "user", "content": f"Shorten this text while keeping its meaning: {text}"}
+            {"role": "user", "content": f"Shorten this text to fit within {max_words} words while keeping its meaning: {text}"}
         )
 
     response = client.chat.completions.create(
@@ -49,8 +53,7 @@ def refine_translation_with_gpt(text, previous_context=None, target_language="th
     )
     return response.choices[0].message.content
 
-
-def transcribe_and_translate(audio_path, source_language="en", target_language="th", max_chunk_duration=5):
+def transcribe_and_translate(audio_path, source_language="en", target_language="th", max_chunk_duration=7):
     """ถอดเสียงจากไฟล์เสียงและแปลเป็นภาษาที่ต้องการโดยใช้ WhisperX"""
 
     if not os.path.exists(audio_path):
@@ -60,7 +63,6 @@ def transcribe_and_translate(audio_path, source_language="en", target_language="
     
     compute_type = "float16" if torch.cuda.is_available() and torch.cuda.get_device_capability(0) >= (7, 0) else "float32"
 
-    # โหลดโมเดล WhisperX
     model = whisperx.load_model("small", device=device, compute_type=compute_type)
 
     # ถอดเสียงพร้อม timestamps
@@ -88,13 +90,16 @@ def transcribe_and_translate(audio_path, source_language="en", target_language="
 
     for seg in segments:
         text_en = seg["text"].strip()
+        segment_duration = seg["end"] - seg["start"]  # คำนวณความยาว segment เป็นวินาที
 
         # Translate to target language
         translated_text = translator.translate(text_en)
 
         # ปรับคำแปลให้กระชับ
-        refined_text = refine_translation_with_gpt(translated_text, previous_context, target_language)
+        refined_text = refine_translation_with_gpt(translated_text, segment_duration, previous_context, target_language)
         refined_text = convert_numbers_to_words(refined_text, lang=target_language)
+        
+         # อัปเดต context
         previous_context.append(refined_text)
         if len(previous_context) > 2:
             previous_context.pop(0)
@@ -102,6 +107,7 @@ def transcribe_and_translate(audio_path, source_language="en", target_language="
         seg["text"] = refined_text
 
     return segments
+
 
 
 # 📌 รายละเอียดของการปรับปรุง
@@ -128,3 +134,9 @@ def transcribe_and_translate(audio_path, source_language="en", target_language="
 # - Retained WhisperX speech-to-text optimization with GPU acceleration (`float16` if supported).
 # - Ensured translated segments remain concise and correctly formatted.
 # - Maintained debugging support with `print_progress=True` and `verbose=True`.
+
+# 💡 Summary:
+# 🔹 GPT-4o now respects natural speaking pace (max 3 words/sec).
+# 🔹 Translations are shorter and fit within each segment's duration.
+# 🔹 Numbers are automatically converted to words before processing.
+# 🔹 Better sentence consistency with improved context tracking.

@@ -12,4 +12,5 @@ openai
 transformers
 torch
 python-dotenv
+num2words
 # !pip install -r requirements.txt --use-deprecated=legacy-resolver

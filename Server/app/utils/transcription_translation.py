@@ -5,6 +5,8 @@ import whisperx
 import openai
 from deep_translator import GoogleTranslator
 import torch
+import re
+from num2words import num2words
 
 load_dotenv(".env.local")
 api_key = os.getenv("OPENAI_API_KEY")
@@ -13,16 +15,40 @@ if not api_key:
 
 client = openai.OpenAI(api_key=api_key)
 
-def refine_translation_with_gpt(text):
-    """ใช้ GPT-4 ปรับการแปลให้กระชับ"""
+def convert_numbers_to_words(text, lang="th"):
+    """แปลงตัวเลขในข้อความให้เป็นคำอ่าน"""
+    def replace_number(match):
+        number = match.group()
+        return num2words(int(number), lang=lang)
+
+    return re.sub(r'\b\d+\b', replace_number, text)
+def refine_translation_with_gpt(text, previous_context=None, target_language="th"):
+    """ใช้ GPT-4o เพื่อปรับคำแปลให้สั้นลง โดยไม่เปลี่ยนภาษา"""
+    text = convert_numbers_to_words(text, lang=target_language)
+
+    messages = [
+        {"role": "system", "content": 
+         f"You are a professional language editor. Your job is to shorten the text while keeping the meaning intact. "
+         f"DO NOT translate. DO NOT change the language. DO NOT add or repeat sentences from previous context."}
+    ]
+
+    if previous_context:
+        recent_context = " ".join(previous_context[-2:])
+        messages.append(
+            {"role": "user", "content": f"Previous context:\n{recent_context}\n"
+                                        f"Now, shorten the following text while keeping its meaning: {text}"}
+        )
+    else:
+        messages.append(
+            {"role": "user", "content": f"Shorten this text while keeping its meaning: {text}"}
+        )
+
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "คุณเป็นนักแปลที่เชี่ยวชาญในการย่อคำแปลให้กระชับและตรงประเด็น"},
-            {"role": "user", "content": f"ช่วยปรับคำแปลนี้ให้สั้นลงและคงความหมายไว้: {text}"}
-        ]
+        model="gpt-4o",
+        messages=messages
     )
     return response.choices[0].message.content
+
 
 def transcribe_and_translate(audio_path, source_language="en", target_language="th", max_chunk_duration=5):
     """ถอดเสียงจากไฟล์เสียงและแปลเป็นภาษาที่ต้องการโดยใช้ WhisperX"""
@@ -30,10 +56,8 @@ def transcribe_and_translate(audio_path, source_language="en", target_language="
     if not os.path.exists(audio_path):
         raise FileNotFoundError(f"Audio file not found: {audio_path}")
 
-    # ตรวจสอบว่าใช้ GPU ได้หรือไม่
     device = "cuda" if torch.cuda.is_available() else "cpu"
     
-    # ตรวจสอบว่า GPU รองรับ float16 หรือไม่
     compute_type = "float16" if torch.cuda.is_available() and torch.cuda.get_device_capability(0) >= (7, 0) else "float32"
 
     # โหลดโมเดล WhisperX
@@ -60,18 +84,22 @@ def transcribe_and_translate(audio_path, source_language="en", target_language="
     # segments = aligned_result["segments"]
 
     translator = GoogleTranslator(source=source_language, target=target_language)
+    previous_context = [] 
 
     for seg in segments:
         text_en = seg["text"].strip()
 
-        # แปลเป็นภาษาไทย
+        # Translate to target language
         translated_text = translator.translate(text_en)
 
         # ปรับคำแปลให้กระชับ
-        translated_text = refine_translation_with_gpt(translated_text)
+        refined_text = refine_translation_with_gpt(translated_text, previous_context, target_language)
+        refined_text = convert_numbers_to_words(refined_text, lang=target_language)
+        previous_context.append(refined_text)
+        if len(previous_context) > 2:
+            previous_context.pop(0)
 
-        # อัพเดทข้อมูลแปลกลับไปใน segments
-        seg["text"] = translated_text
+        seg["text"] = refined_text
 
     return segments
 
@@ -90,3 +118,13 @@ def transcribe_and_translate(audio_path, source_language="en", target_language="
 # - Added `GoogleTranslator` to handle automatic language translation.
 # - Set `max_chunk_duration=5` to limit segment length for better synchronization.
 # - Enabled `print_progress=True` and `verbose=True` for better debugging.
+
+# feat: Enhance AI dubbing with number conversion & GPT-4o refinement
+
+# - Switched to GPT-4o for improved translation accuracy and contextual coherence.
+# - Implemented `convert_numbers_to_words()` to replace numeric digits with Thai words for better readability.
+# - Updated `refine_translation_with_gpt()` to maintain language consistency and prevent unwanted merging.
+# - Introduced `previous_context` tracking to improve sentence flow without repetition.
+# - Retained WhisperX speech-to-text optimization with GPU acceleration (`float16` if supported).
+# - Ensured translated segments remain concise and correctly formatted.
+# - Maintained debugging support with `print_progress=True` and `verbose=True`.

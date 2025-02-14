@@ -107,7 +107,7 @@ def transcribe_and_translate(audio_path, source_language="en", target_language="
     # #  ใช้ข้อมูลจาก `aligned_result["segments"]`
     # segments = aligned_result["segments"]
 
-    translator = GoogleTranslator(source=source_language, target=target_language)
+    translator = GoogleTranslator(source="auto", target=target_language)
     previous_context = [] 
 
     for seg in segments:
@@ -139,36 +139,3 @@ def transcribe_and_translate(audio_path, source_language="en", target_language="
         seg["text"] = refined_text
 
     return segments
-
-
-
-# 📌 รายละเอียดของการปรับปรุง
-# ✅ เพิ่ม GPT-4 (refine_translation_with_gpt()) → ใช้ AI ปรับคำแปลให้กระชับขึ้น
-# ✅ ใช้ WhisperX (whisperx.load_model()) → ถอดเสียงจากวิดีโอและรองรับ GPU acceleration
-# ✅ รองรับการใช้ GPU (torch.cuda.is_available()) → ใช้ float16 ถ้า GPU รองรับ
-# ✅ ใช้ GoogleTranslator → แปลภาษาแบบอัตโนมัติ
-# ✅ ปรับ max_chunk_duration → จำกัดเวลาของแต่ละ segment ให้ ไม่เกิน 5 วินาที เพื่อให้ได้ผลลัพธ์ที่แม่นยำขึ้น
-# ✅ เพิ่ม print_progress=True และ verbose=True → แสดงความคืบหน้าขณะรันโค้ด
-
-# feat: Improve AI dubbing with GPT-4 translation & WhisperX optimization
-# - Integrated GPT-4 (`refine_translation_with_gpt()`) to refine translations and make them more concise.
-# - Optimized WhisperX for speech-to-text processing, including GPU acceleration (`float16` if supported).
-# - Added `GoogleTranslator` to handle automatic language translation.
-# - Set `max_chunk_duration=5` to limit segment length for better synchronization.
-# - Enabled `print_progress=True` and `verbose=True` for better debugging.
-
-# feat: Enhance AI dubbing with number conversion & GPT-4o refinement
-
-# - Switched to GPT-4o for improved translation accuracy and contextual coherence.
-# - Implemented `convert_numbers_to_words()` to replace numeric digits with Thai words for better readability.
-# - Updated `refine_translation_with_gpt()` to maintain language consistency and prevent unwanted merging.
-# - Introduced `previous_context` tracking to improve sentence flow without repetition.
-# - Retained WhisperX speech-to-text optimization with GPU acceleration (`float16` if supported).
-# - Ensured translated segments remain concise and correctly formatted.
-# - Maintained debugging support with `print_progress=True` and `verbose=True`.
-
-# 💡 Summary:
-# 🔹 GPT-4o now respects natural speaking pace (max 3 words/sec).
-# 🔹 Translations are shorter and fit within each segment's duration.
-# 🔹 Numbers are automatically converted to words before processing.
-# 🔹 Better sentence consistency with improved context tracking.

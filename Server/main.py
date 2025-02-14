@@ -1,6 +1,7 @@
 from fastapi import FastAPI
-from app.api.routes.video_routes import router as video_router
 from fastapi.middleware.cors import CORSMiddleware
+from app.api.routes.video_routes import router as video_router
+from app.api.routes.rvc_routes import router as rvc_router
 
 app = FastAPI(debug=True)
 
@@ -15,6 +16,7 @@ app.add_middleware(
 
 # Register routes
 app.include_router(video_router, prefix="/video", tags=["Video Processing"])
+app.include_router(rvc_router, prefix="/rvc", tags=["Voice Changer"])
 
 @app.get("/")
 async def root():

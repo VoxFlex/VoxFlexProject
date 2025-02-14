@@ -1,6 +1,4 @@
-
 openai-whisper
-gTTS
 fastapi 
 uvicorn
 httpcore

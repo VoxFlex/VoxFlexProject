@@ -7,6 +7,7 @@ from deep_translator import GoogleTranslator
 import torch
 import re
 from num2words import num2words
+import time
 
 load_dotenv(".env.local")
 api_key = os.getenv("OPENAI_API_KEY")
@@ -34,8 +35,9 @@ def detect_language(text):
     )
     return response.choices[0].message.content.strip().lower()
 
-def translate_with_gpt(text, source_lang, target_lang):
+def translate_with_gpt(text, source_lang, target_lang, segment_duration):
     """ใช้ GPT-4o แปลข้อความหาก Google Translate แปลผิดภาษา"""
+    max_words = int(segment_duration * 3)  # ใช้ค่าเฉลี่ย 3 คำต่อวินาที
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=[
@@ -117,14 +119,14 @@ def transcribe_and_translate(audio_path, source_language="en", target_language="
         # ✅ ใช้ Google Translate แปลก่อน
         translated_text = translator.translate(text_en)
         print(f"🔹 Google Translate: {translated_text}")
-        
+        time.sleep(1)
         # ✅ ตรวจสอบภาษาหลังแปล
         detected_translated_lang = detect_language(translated_text)
         print(f"🔍 Detected language after translation: {detected_translated_lang}")
 
         if detected_translated_lang != target_language:
             print(f"⚠️ Google Translate failed! Using GPT-4o for translation.")
-            translated_text = translate_with_gpt(text_en, source_language, target_language)  # ✅ ใช้ GPT-4o แปลแทน
+            translated_text = translate_with_gpt(text_en, source_language, target_language, segment_duration)
             print(f"✅ GPT-4o Translation: {translated_text}")
         
         # ✅ ปรับคำแปลให้กระชับ

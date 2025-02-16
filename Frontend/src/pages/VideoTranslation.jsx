@@ -163,21 +163,30 @@ const VideoTranslation = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleFileChange = async (file) => {
+
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return; // ถ้าไม่มีไฟล์ให้ return ออกไป
+
+    // รีเซ็ตค่า input เพื่อให้สามารถเลือกไฟล์เดิมซ้ำได้
+    event.target.value = null;
+
     setSelectedFile(file);
     setError(null);
 
-    if (file) {
-      setIsUploading(true);
-      try {
-        const videoUrl = await uploadVideoToServer(file, translateTo || "th");
-        setProcessedVideoUrl(videoUrl);
-      } catch (uploadError) {
-        console.error("Error during upload:", uploadError);
-        setError("Failed to upload and process the video. Please try again.");
-      } finally {
-        setIsUploading(false);
-      }
+    setIsUploading(true);
+    try {
+      const videoUrl = await uploadVideoToServer(
+        file,
+        translateTo || "th",
+        speaker
+      );
+      setProcessedVideoUrl(videoUrl);
+    } catch (uploadError) {
+      console.error("Error during upload:", uploadError);
+      setError("Failed to upload and process the video. Please try again.");
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -240,9 +249,17 @@ const VideoTranslation = () => {
               displayEmpty
               value={originalLanguage}
               onChange={(e) => setOriginalLanguage(e.target.value)}
-              renderValue={(selected) =>
-                selected || "Select Language (Default Voice Detection)"
-              }
+              renderValue={(selected) => {
+                if (!selected)
+                  return "Select Language (Default Voice Detection)";
+                const languageMap = {
+                  th: "Thai",
+                  en: "English",
+                  fr: "French",
+                  de: "German",
+                };
+                return languageMap[selected] || selected;
+              }}
             >
               <MenuItem value="Voice Detection">Voice Detection</MenuItem>
               <MenuItem value="Thai">Thai</MenuItem>
@@ -251,7 +268,7 @@ const VideoTranslation = () => {
             </Select>
           </FormControl>
 
-        {/* Translate to */}
+          {/* Translate to */}
           <Typography variant="subtitle1" gutterBottom>
             Translate to
           </Typography>
@@ -260,7 +277,17 @@ const VideoTranslation = () => {
               displayEmpty
               value={translateTo}
               onChange={(e) => setTranslateTo(e.target.value)}
-              renderValue={(selected) => selected || "Select Language (Default Thai)"}
+              renderValue={(selected) => {
+                if (!selected) return "Select Language (Default Thai)";
+                // Map the value to the display label
+                const languageMap = {
+                  th: "Thai",
+                  en: "English",
+                  fr: "French",
+                  de: "German",
+                };
+                return languageMap[selected] || selected;
+              }}
             >
               <MenuItem value="th">Thai</MenuItem>
               <MenuItem value="en">English</MenuItem>
@@ -278,14 +305,31 @@ const VideoTranslation = () => {
               displayEmpty
               value={speaker}
               onChange={(e) => setSpeaker(e.target.value)}
-              renderValue={(selected) =>
-                selected || "Select Speaker (Default Alley)"
-              }
+              renderValue={(selected) => {
+                if (!selected) return "Select Speaker (Default Alley)";
+                const speakerMap = {
+                  alley: "Alley",
+                  ash: "Ash",
+                  coral: "Coral",
+                  echo: "Echo",
+                  fable: "Fable",
+                  onyx: "Onyx",
+                  nova: "Nova",
+                  sage: "Sage",
+                  shimmer: "Shimmer",
+                };
+                return speakerMap[selected] || selected;
+              }}
             >
-              <MenuItem value="Alley">Alley</MenuItem>
-              <MenuItem value="Thai">Thai</MenuItem>
-              <MenuItem value="English">English</MenuItem>
-              <MenuItem value="Spanish">Spanish</MenuItem>
+              <MenuItem value="alley">Alley</MenuItem>
+              <MenuItem value="ash">Ash</MenuItem>
+              <MenuItem value="coral">Coral</MenuItem>
+              <MenuItem value="echo">Echo</MenuItem>
+              <MenuItem value="fable">Fable</MenuItem>
+              <MenuItem value="onyx">Onyx</MenuItem>
+              <MenuItem value="nova">Nova</MenuItem>
+              <MenuItem value="sage">Sage</MenuItem>
+              <MenuItem value="shimmer">Shimmer</MenuItem>
             </Select>
           </FormControl>
 
@@ -294,10 +338,11 @@ const VideoTranslation = () => {
             <input
               type="file"
               accept="video/*"
-              onChange={(e) => handleFileChange(e.target.files[0])}
+              onChange={handleFileChange} // ใช้ event แทนการส่งแค่ไฟล์
               ref={fileInputRef}
               style={{ display: "none" }}
             />
+
             <Button
               variant="contained"
               color="primary"
@@ -360,15 +405,18 @@ const VideoTranslation = () => {
                 <input
                   type="file"
                   accept="video/*"
-                  onChange={(e) => handleFileChange(e.target.files[0])}
+                  onChange={handleFileChange}
                   style={{ display: "none" }}
                   id="upload-file"
                 />
+
                 <label htmlFor="upload-file" style={{ cursor: "pointer" }}>
                   Click to Upload File
                 </label>
                 {error && (
-                  <Typography sx={{ marginTop: 2, color: "red", fontSize: "0.875rem" }}>
+                  <Typography
+                    sx={{ marginTop: 2, color: "red", fontSize: "0.875rem" }}
+                  >
                     {error}
                   </Typography>
                 )}
@@ -379,8 +427,9 @@ const VideoTranslation = () => {
                 style={{
                   borderRadius: "8px",
                   backgroundColor: "#000",
-                  maxWidth: "100%",
-                  maxHeight: "100%",
+                  maxWidth: "100%", // ป้องกันวิดีโอขยายเกินพื้นที่
+                  maxHeight: "50vh", // ป้องกันวิดีโอขยายเกินครึ่งจอ
+                  objectFit: "contain", // ทำให้วิดีโอไม่ถูกบีบ
                 }}
               >
                 <source src={processedVideoUrl} type="video/mp4" />

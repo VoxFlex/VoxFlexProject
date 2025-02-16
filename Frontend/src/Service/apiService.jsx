@@ -7,11 +7,12 @@ import axios from "axios";
  * @param {string} targetLanguage - The target language for translation.
  * @returns {Promise<Blob>} - A promise that resolves with the processed video blob.
  */
-export const uploadVideoToServer = async (videoFile, targetLanguage = "th") => {
+export const uploadVideoToServer = async (videoFile, targetLanguage, voice_model) => {
   const formData = new FormData();
   formData.append("video_file", videoFile); // Attach the video file
   formData.append("target_language", targetLanguage); // Attach the target language
-
+  formData.append("voice_model", voice_model); // Attach the target language
+  
   try {
     // Post form data to the server
     const response = await axios.post(

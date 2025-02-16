@@ -96,7 +96,7 @@ const VideoTranslationSetting = ({
           <MenuItem value="th">Thai</MenuItem>
           <MenuItem value="en">English</MenuItem>
           <MenuItem value="fr">French</MenuItem>
-          <MenuItem value="German">German</MenuItem>
+          <MenuItem value="ge">German</MenuItem>
         </Select>
       </FormControl>
 

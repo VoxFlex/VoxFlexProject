@@ -23,17 +23,19 @@ const Home = () => {
       <Box
         sx={{
           display: "flex",
-          paddingBlock: 10,
+          paddingBlock: 5,
           gap: 12,
           justifyContent: "center",
-          flexDirection: { xs: "column-reverse", md: "row" }, // Adjust direction for smaller screens
+          // flexDirection: { xs: "column-reverse", md: "row" }, // Adjust direction for smaller screens
+          flexDirection: { xs: "column-reverse", md: "column-reverse" }, // Adjust direction for smaller screens
           alignItems: "center",
         }}
       >
         {/* mainText container */}
         <Box
           sx={{
-            textAlign: { xs: "center", md: "left" },
+            // textAlign: { xs: "center", md: "left" },
+            textAlign: { xs: "center", md: "center" },
             maxWidth: { xs: "100%", md: "50%" },
           }}
         >
@@ -56,19 +58,22 @@ const Home = () => {
             sx={{
               marginBlock: 4,
               color: "#334C65",
-              textAlign: { xs: "center", md: "left" },
+              // textAlign: { xs: "center", md: "left" },
+              textAlign: { xs: "center", md: "center" },
               fontSize: "1rem",
               marginLeft: { xs: 0, md: 1 },
             }}
           >
-            Bringing Your Videos to Life in Any Language
+            AI Video Translation for a Global Audience.Translate a video with multi-languages with AI video translation.
           </Typography>
 
           {/* mainText button */}
           <Box
             sx={{
               display: "flex",
-              flexDirection: { xs: "column", sm: "row" }, // Stack buttons on small screens
+              flexDirection: { xs: "column", sm: "colum" }, // Stack buttons on small screens
+              // flexDirection: { xs: "column", sm: "row" }, // Stack buttons on small screens
+
               gap: "1rem",
               justifyContent: { xs: "center", md: "flex-start" },
               marginBottom: "3rem",
@@ -102,7 +107,7 @@ const Home = () => {
         <Box sx={{ maxWidth: { xs: "80%", md: "40%" }, textAlign: "center" }}>
           <img
             style={{ width: "100%", height: "auto" }}
-            src="../../image/image_landing.png"
+            src="../../image/homeImage.png"
             alt="Landing Illustration"
           />
         </Box>

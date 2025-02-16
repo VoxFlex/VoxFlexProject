@@ -1,131 +1,213 @@
-import React, { useState, useEffect } from "react";
-import { Box, Typography, Grid2 } from "@mui/material";
-import VideoTranslationSetting from "../components/VideoTranslationSetting";
-import VideoUploadAndDisplay from "../components/VideoUploadAndDisplay";
-import { uploadVideoToServer } from "../Service/apiService";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  Box,
+  Container,
+  Card,
+  CardContent,
+  Typography,
+  Grid,
+  Tab,
+  Tabs,
+  Icon,
+} from "@mui/material";
 
+import VideoFileIcon from "@mui/icons-material/VideoFile";
+import MicIcon from "@mui/icons-material/Mic";
+import TextSnippetIcon from "@mui/icons-material/TextSnippet";
+import MusicNoteIcon from "@mui/icons-material/MusicNote";
+import ChatIcon from "@mui/icons-material/Chat";
+// import ToolCard from "../components/ToolCard";
 const AiStudio = () => {
-  const [originalLanguage, setOriginalLanguage] = useState("");
-  const [translateTo, setTranslateTo] = useState("");
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [processedVideoUrl, setProcessedVideoUrl] = useState(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [error, setError] = useState(null);
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [selectedTab, setSelectedTab] = useState("all");
 
-  useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener("resize", handleResize);
-
-    // ลบ event listener เมื่อ component ถูก unmount
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const handleFileChange = async (file) => {
-    setSelectedFile(file);
-    setError(null); // Clear previous errors
-
-    if (file) {
-      setIsUploading(true);
-
-      try {
-        const videoUrl = await uploadVideoToServer(
-          file,
-          translateTo || "th" // Use the selected target language
-        );
-        setProcessedVideoUrl(videoUrl); // Update the processed video URL
-      } catch (uploadError) {
-        console.error("Error during upload:", uploadError);
-        setError("Failed to upload and process the video. Please try again.");
-      } finally {
-        setIsUploading(false); // Reset uploading state
-      }
-    }
+  const handleTabChange = (event, newValue) => {
+    setSelectedTab(newValue);
   };
+  const features = [
+    {
+      id: "video-translator",
+      icon: VideoFileIcon,
+      title: "Video Translator",
+      description: "Translate Videos to 130+ languages",
+      link: "/video-translator",
+      category: "video",
+    },
+    {
+      id: "voice-converter",
+      icon: MicIcon,
+      title: "Voice Converter",
+      description: "Change the voice from orinal voice by voice model",
+      link: "/voice-converter",
+      category: "audio",
+    },
+    {
+      id: "video-dubbing",
+      icon: MusicNoteIcon,
+      title: "Video Dubbing (Coming Soon)",
+      description: "Dub videos with realistic AI voices",
+      link: "/video-dubbing",
+      category: "video",
+    },
+    {
+      id: "audio-translation",
+      icon: ChatIcon,
+      title: "Audio Translation (Coming Soon)",
+      description: "Translate Audio with AI",
+      link: "/audio-translation",
+      category: "audio",
+    },
+    {
+      id: "song-voice",
+      icon: MicIcon,
+      title: "Song Voice Converter (Coming Soon)",
+      description: "Change the song's voice",
+      link: "/song-voice",
+      category: "audio",
+    },
+    {
+      id: "text-speech",
+      icon: TextSnippetIcon,
+      title: "Text to Speech (Coming Soon)",
+      description: "Convert text to speech",
+      link: "/text-speech",
+      category: "text",
+    },
+    {
+      id: "subtitle",
+      icon: TextSnippetIcon,
+      title: "Subtitle Generator (Coming Soon)",
+      description: "Auto Generate subtitles with AI",
+      link: "/subtitle",
+      category: "text",
+    },
+  ];
+
+  // const features = [
+  //   {
+  //     id: "video-translator",
+  //     icon: "../../image/icon_video_translator.svg",
+  //     title: "Video Translator",
+  //     description: "Translate Videos to 130+ languages",
+  //     link: "/video-translator",
+  //     category: "video",
+  //   },
+  //   {
+  //     id: "song-translator",
+  //     icon: "../../image/icon_song_translator.svg",
+  //     title: "Song Translator",
+  //     description: "Translate Song to 130+ languages",
+  //     link: "/song-translator",
+  //     category: "audio",
+  //   },
+  //   {
+  //     id: "video-dubbing",
+  //     icon: "../../image/icon_video_dubbing.svg",
+  //     title: "Video Dubbing (Coming Soon)",
+  //     description: "Dub videos with realistic AI voices",
+  //     link: "/video-dubbing",
+  //     category: "video",
+  //   },
+  //   {
+  //     id: "song-voice",
+  //     icon: "../../image/icon_song_voice.svg",
+  //     title: "Song Voice Converter",
+  //     description: "Change the song's voice",
+  //     link: "/song-voice",
+  //     category: "audio",
+  //   },
+  //   {
+  //     id: "audio-translation",
+  //     icon: "../../image/icon_audio_translation.svg",
+  //     title: "Audio Translation",
+  //     description: "Translate Audio with AI",
+  //     link: "/audio-translation",
+  //     category: "audio",
+  //   },
+  //   {
+  //     id: "text-speech",
+  //     icon: "../../image/icon_text_speech.svg",
+  //     title: "Text to Speech",
+  //     description: "Convert text to speech",
+  //     link: "/text-speech",
+  //     category: "text",
+  //   },
+  //   {
+  //     id: "subtitle",
+  //     icon: "../../image/icon_subtitle.svg",
+  //     title: "Subtitle Generator",
+  //     description: "Auto Generate subtitles with AI",
+  //     link: "/subtitle",
+  //     category: "text",
+  //   },
+  // ];
+
+  const filteredFeatures = features.filter(
+    (feature) => selectedTab === "all" || feature.category === selectedTab
+  );
 
   return (
-    <Box
-      sx={{
-        flexGrow: 1,
-        maxWidth: "90vw",
-        margin: "0 auto",
-        minHeight: "70vh",
-        marginTop: 6,
-      }}
-    >
-      <Grid2
-        container
-        spacing={2}
-        sx={{
-          flexDirection: windowWidth >= 600 ? "row" : "column",
-        }}
-      >
-        {/* Left Section: Video Translation */}
-        <Grid2 xs={12} md={6} size="grow">
-          <Box
-            sx={{
-              padding: 3,
-              backgroundColor: "#fff",
-              borderRadius: 2,
-              boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-            }}
-          >
-            <Typography
-              variant="h5"
-              sx={{
-                marginBottom: 3,
-                fontWeight: "bold",
-                textAlign: "center",
-                color: "#333",
-              }}
-            >
-              Video Translation
-            </Typography>
-            <VideoTranslationSetting
-              originalLanguage={originalLanguage}
-              translateTo={translateTo}
-              setOriginalLanguage={setOriginalLanguage}
-              setTranslateTo={setTranslateTo}
-              isUploading={isUploading}
-              selectedFile={selectedFile}
-              processedVideoUrl={processedVideoUrl}
-              onFileChange={handleFileChange}
-            />
-          </Box>
-        </Grid2>
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+      <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
+        <Tabs value={selectedTab} onChange={handleTabChange}>
+          <Tab label="All" value="all" />
+          <Tab label="Video" value="video" />
+          <Tab label="Audio" value="audio" />
+          <Tab label="Text" value="text" />
+        </Tabs>
+      </Box>
 
-        {/* Right Section: Video Player */}
-        <Grid2 xs={12} md={6} size="grow">
-          <Box
-            sx={{
-              padding: 3,
-              backgroundColor: "#fff",
-              borderRadius: 2,
-              boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-              marginBottom: 5,
-            }}
-          >
-            <Typography
-              variant="h5"
+      <Grid container spacing={3}>
+        {filteredFeatures.map((feature) => (
+          <Grid item xs={12} sm={6} md={6} key={feature.id}>
+            <Card
+              component={Link}
+              to={feature.link}
               sx={{
-                marginBottom: 3,
-                fontWeight: "bold",
-                textAlign: "center",
-                color: "#333",
+                height: "100%",
+                display: "flex",
+                textDecoration: "none",
+                bgcolor:
+                  feature.id === "video-translator" || feature.id === "voice-converter"
+                    ? // feature.id === "video-translator" || feature.id === "video-dubbing"
+
+                      "#f8faff"
+                    : "#f5f4f2",
+                "&:hover": {
+                  boxShadow: 3,
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    transform: "translateY(-8px)",
+                    boxShadow: 3,
+                    cursor: "pointer",
+                  },
+                  transition: "all 0.2s",
+                },
               }}
             >
-              Upload and Preview
-            </Typography>
-            <VideoUploadAndDisplay
-              apiVideoUrl={processedVideoUrl}
-              onFileChange={handleFileChange}
-              isUploading={isUploading}
-              error={error}
-            />
-          </Box>
-        </Grid2>
-      </Grid2>
-    </Box>
+              <CardContent
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2,
+                  p: 3,
+                }}
+              >
+                <feature.icon sx={{ fontSize: 40, color: "primary.main" }} />
+                <Box>
+                  <Typography variant="h6" color="text.primary">
+                    {feature.title}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {feature.description}
+                  </Typography>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Container>
   );
 };
 

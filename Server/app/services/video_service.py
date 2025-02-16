@@ -9,7 +9,7 @@ from app.utils.file_utils import save_uploaded_file, cleanup_files
 
 class VideoService:
     @staticmethod
-    async def process_video(video_file, target_language):
+    async def process_video(video_file, target_language, voice_model: str):
         base_dir = os.path.dirname(os.path.abspath(__file__))
         input_dir = os.path.abspath(os.path.join(base_dir, "../../input"))
         temp_dir = os.path.abspath(os.path.join(base_dir, "../../temp"))
@@ -46,8 +46,9 @@ class VideoService:
             print("Transcription and translation complete.")
 
             # Step 4: Generate speech audio from translated text
-            generate_speech_with_sync(segments, paths["translated_audio"], target_language)
+            generate_speech_with_sync(segments, paths["translated_audio"], target_language, voice_model)
             print(f"Translated audio saved at: {paths['translated_audio']}")
+            print("service voice model: ", voice_model)
 
             # run_inference(
             #     video_path=paths["video"],

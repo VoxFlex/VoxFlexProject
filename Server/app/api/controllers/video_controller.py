@@ -6,10 +6,14 @@ from app.utils.file_utils import iterfile
 
 class VideoController:
     @staticmethod
-    async def process_video(video_file: UploadFile, target_language: str):
+    async def process_video(
+        video_file: UploadFile, 
+        target_language: str, 
+        voice_model: str
+        ):
         try:
-            result_path = await VideoService.process_video(video_file, target_language)
-
+            result_path = await VideoService.process_video(video_file, target_language, voice_model)
+            print("vc voice model: ", voice_model)
             if not os.path.exists(result_path):
                 raise FileNotFoundError(f"Resulting file not found: {result_path}")
 

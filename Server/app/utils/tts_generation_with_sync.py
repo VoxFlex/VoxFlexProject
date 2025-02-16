@@ -10,10 +10,13 @@ if not api_key:
 
 client = openai.OpenAI(api_key=api_key)
 
-def generate_speech_with_sync(text_segments, output_audio_path, target_language,voice="alloy"):
-    """สร้างไฟล์เสียงจากข้อความโดยใช้ OpenAI TTS-1 และปรับตาม timestamps"""
+def generate_speech_with_sync(text_segments, output_audio_path, target_language, voice_model: str):
+    """
+    สร้างไฟล์เสียงจากข้อความโดยใช้ OpenAI TTS-1 และปรับตาม timestamps
+    voice = alloy, ash, coral, echo, fable, onyx, nova, sage, shimmer
+    """
     combined_audio = AudioSegment.silent(duration=0)
-
+    print("service voice model: ", voice_model)
     for idx, segment in enumerate(text_segments):
         text = segment['text']
         start_time = segment['start'] * 1000  # convert to milliseconds
@@ -25,7 +28,7 @@ def generate_speech_with_sync(text_segments, output_audio_path, target_language,
         # ใช้ OpenAI TTS-1 สร้างเสียง 
         with client.audio.speech.with_streaming_response.create(
             model="tts-1",
-            voice=voice,
+            voice=voice_model,
             input=text
         ) as response:
             temp_audio_path = f"temp_segment_{idx}.mp3"

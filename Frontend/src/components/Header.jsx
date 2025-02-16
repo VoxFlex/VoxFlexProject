@@ -143,7 +143,7 @@ const Header = () => {
               textAlign: "center",
             }}
           >
-            Ai Studio
+            AI Studio
           </Link>
           <Link
             to="/about"

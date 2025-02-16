@@ -60,7 +60,7 @@ const Home = () => {
               color: "#334C65",
               // textAlign: { xs: "center", md: "left" },
               textAlign: { xs: "center", md: "center" },
-              fontSize: "1rem",
+              fontSize: "25px",
               marginLeft: { xs: 0, md: 1 },
             }}
           >

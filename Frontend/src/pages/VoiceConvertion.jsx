@@ -8,12 +8,14 @@ import {
   CircularProgress,
   FormControl,
   InputLabel,
+  Card,
+  CardContent,
+  Stack,
+  Grid,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DownloadIcon from "@mui/icons-material/Download";
-import axios from "axios";
-
-const BASE_URL = "http://localhost:8000/rvc"; // Change to your API base URL
+import RVCApiService from "../Service/RVCApiService";
 
 const VoiceConversion = () => {
   const [models, setModels] = useState([]);
@@ -23,29 +25,22 @@ const VoiceConversion = () => {
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = React.useRef(null);
 
-  // 🔹 Fetch Available Models
   useEffect(() => {
     const fetchModels = async () => {
-      try {
-        const response = await axios.get(`${BASE_URL}/models`);
-        setModels(response.data.available_models);
-      } catch (error) {
-        console.error("❌ Error fetching models:", error);
-      }
+      const availableModels = await RVCApiService.listModels();
+      setModels(availableModels);
     };
     fetchModels();
   }, []);
 
-  // 🔹 Handle File Selection
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
       setSelectedFile(file);
-      setConvertedAudioUrl(null); // Reset previous output
+      setConvertedAudioUrl(null);
     }
   };
 
-  // 🔹 Upload & Convert
   const handleConvert = async () => {
     if (!selectedFile || !selectedModel) {
       alert("Please select a model and an audio file.");
@@ -53,28 +48,32 @@ const VoiceConversion = () => {
     }
 
     setIsLoading(true);
-    const formData = new FormData();
-    formData.append("file", selectedFile);
 
     try {
-      const response = await axios.post(`${BASE_URL}/voice/convert`, formData);
-      const base64Audio = response.data.audio_base64;
-      const outputModel = response.data.model_name;
-
-      // 🔹 Decode Base64 → Audio Blob
-      const audioBlob = new Blob([Uint8Array.from(atob(base64Audio), (c) => c.charCodeAt(0))], { type: "audio/wav" });
-      const audioUrl = URL.createObjectURL(audioBlob);
-      setConvertedAudioUrl(audioUrl);
-      alert(`✅ Voice Converted! Model: ${outputModel}`);
+      const modelSelected = await RVCApiService.selectModel(selectedModel);
+      if (modelSelected) {
+        const response = await RVCApiService.convertVoice(selectedFile);
+        if (response?.audio_base64) {
+          const audioBlob = new Blob(
+            [Uint8Array.from(atob(response.audio_base64), (c) => c.charCodeAt(0))],
+            { type: "audio/wav" }
+          );
+          const audioUrl = URL.createObjectURL(audioBlob);
+          setConvertedAudioUrl(audioUrl);
+        } else {
+          alert("Failed to process the audio.");
+        }
+      } else {
+        alert("Failed to select model.");
+      }
     } catch (error) {
-      console.error("❌ Error converting voice:", error);
-      alert("Failed to process the audio.");
+      console.error("Error during conversion:", error);
+      alert("An error occurred during conversion.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 🔹 Download Converted Audio
   const handleDownload = () => {
     if (!convertedAudioUrl) return;
     const link = document.createElement("a");
@@ -84,76 +83,58 @@ const VoiceConversion = () => {
   };
 
   return (
-    <Box sx={{ textAlign: "center", maxWidth: "600px", margin: "auto", padding: "20px" }}>
-      <Typography variant="h4" sx={{ marginBottom: 3 }}>Voice Conversion</Typography>
+    <Box sx={{ display: "flex", justifyContent: "center", mt: 5 }}>
+      <Card sx={{ width: 500, padding: 3, boxShadow: 3 }}>
+        <CardContent>
+          <Typography variant="h5" textAlign="center" gutterBottom>
+            Voice Conversion
+          </Typography>
+          
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <InputLabel>Select Voice Model</InputLabel>
+            <Select value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)}>
+              {models.map((model, index) => (
+                <MenuItem key={index} value={model}>{model}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
-      {/* 🔹 Model Selection */}
-      <FormControl fullWidth sx={{ marginBottom: 2 }}>
-        <InputLabel>Select Voice Model</InputLabel>
-        <Select
-          value={selectedModel}
-          onChange={(e) => setSelectedModel(e.target.value)}
-        >
-          {models.map((model, index) => (
-            <MenuItem key={index} value={model}>{model}</MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+          <Stack spacing={2} alignItems="center">
+            <input type="file" accept="audio/*" onChange={handleFileChange} ref={fileInputRef} style={{ display: "none" }} />
+            <Button variant="contained" startIcon={<CloudUploadIcon />} onClick={() => fileInputRef.current.click()}>
+              {selectedFile ? "Change File" : "Upload Voice File"}
+            </Button>
 
-      {/* 🔹 File Upload */}
-      <input
-        type="file"
-        accept="audio/*"
-        onChange={handleFileChange}
-        ref={fileInputRef}
-        style={{ display: "none" }}
-      />
-      <Button
-        variant="contained"
-        color="primary"
-        startIcon={<CloudUploadIcon />}
-        onClick={() => fileInputRef.current.click()}
-        sx={{ marginBottom: 2 }}
-      >
-        {selectedFile ? "Change File" : "Upload Voice File"}
-      </Button>
+            {selectedFile && <Typography variant="body2">📂 {selectedFile.name}</Typography>}
 
-      {/* 🔹 Show Selected File */}
-      {selectedFile && (
-        <Typography sx={{ marginBottom: 2 }}>
-          Selected: {selectedFile.name}
-        </Typography>
-      )}
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={handleConvert}
+              disabled={!selectedFile || !selectedModel || isLoading}
+            >
+              {isLoading ? <CircularProgress size={24} /> : "Convert Voice"}
+            </Button>
+          </Stack>
 
-      {/* 🔹 Convert Button */}
-      <Button
-        variant="contained"
-        color="secondary"
-        onClick={handleConvert}
-        disabled={!selectedFile || !selectedModel || isLoading}
-        sx={{ marginBottom: 2 }}
-      >
-        {isLoading ? <CircularProgress size={24} /> : "Convert Voice"}
-      </Button>
-
-      {/* 🔹 Download & Play Converted Audio */}
-      {convertedAudioUrl && (
-        <Box>
-          <Typography sx={{ marginTop: 2 }}>✅ Conversion Completed!</Typography>
-          <audio controls style={{ width: "100%", marginTop: 10 }}>
-            <source src={convertedAudioUrl} type="audio/wav" />
-            Your browser does not support the audio tag.
-          </audio>
-          <Button
-            variant="outlined"
-            startIcon={<DownloadIcon />}
-            onClick={handleDownload}
-            sx={{ marginTop: 2 }}
-          >
-            Download Converted Audio
-          </Button>
-        </Box>
-      )}
+          {convertedAudioUrl && (
+            <Grid container spacing={2} justifyContent="center" sx={{ mt: 3 }}>
+              <Grid item xs={12} textAlign="center">
+                <Typography color="success.main">✅ Conversion Completed!</Typography>
+                <audio controls style={{ width: "100%", marginTop: 10 }}>
+                  <source src={convertedAudioUrl} type="audio/wav" />
+                  Your browser does not support the audio tag.
+                </audio>
+              </Grid>
+              <Grid item>
+                <Button variant="outlined" startIcon={<DownloadIcon />} onClick={handleDownload}>
+                  Download Audio
+                </Button>
+              </Grid>
+            </Grid>
+          )}
+        </CardContent>
+      </Card>
     </Box>
   );
 };

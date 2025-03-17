@@ -118,9 +118,9 @@ def transcribe_and_translate(audio_path, source_language="en", target_language="
 
         # ✅ ใช้ Google Translate แปลก่อน
         translated_text = translator.translate(text_en)
-        print(f"🔹 Google Translate: {translated_text}")
-        time.sleep(1)
-        # ✅ ตรวจสอบภาษาหลังแปล
+        print(f"Google Translate: {translated_text}")
+        time.sleep(0.5)
+        # ตรวจสอบภาษาหลังแปล
         detected_translated_lang = detect_language(translated_text)
         print(f"🔍 Detected language after translation: {detected_translated_lang}")
 

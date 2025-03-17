@@ -86,6 +86,154 @@ VoxFlex is a cutting-edge platform designed to make multimedia content accessibl
 You can also choose detect language as a original language.
 4. Receive the translated, voice-synthesized, and lip-synced content.
 
+## 📡 Server API Documentation
+The backend API, powered by **FastAPI**, provides a range of endpoints to support multimedia translation, voice synthesis, and text-to-speech functionalities. Below are the available endpoints and their usage.
+
+---
+
+### 🚀 API Endpoints
+
+### **Voice Conversion APIs**
+
+### 1. **Convert Voice**
+**`POST /voice/convert`**  
+> **Description:** Converts the uploaded voice file using the selected model.
+
+**Request Parameters:**
+- `file` (file) — The uploaded audio file in `.wav` or `.mp3` format.
+
+**Sample Request:**
+```bash
+curl -X POST "http://localhost:8000/voice/convert" \
+  -F "file=@your_audio.wav"
+```
+
+---
+
+### 2. **Voice Translation**
+**`POST /voice/translate`**  
+> **Description:** Translates uploaded audio into the desired language and generates a new voiceover.
+
+**Request Parameters:**
+- `audio_file` (file) — The uploaded audio file in `.wav` or `.mp3`.
+- `target_language` (string) — The language to translate the audio into. (Default: `en`)
+- `voice_model` (string) — The voice model for the translation. Supported models: `alloy`, `ash`, `coral`, `echo`, `fable`, `onyx`, `nova`, `sage`, `shimmer`.
+
+**Sample Request:**
+```bash
+curl -X POST "http://localhost:8000/voice/translate" \
+  -F "audio_file=@your_audio.wav" \
+  -F "target_language=th" \
+  -F "voice_model=alloy"
+```
+
+---
+
+### **Song Conversion API**
+---
+
+### 3. **Convert Song**
+**`POST /song/convert`**  
+> **Description:** Converts the uploaded song file using the selected voice model.
+
+**Request Parameters:**
+- `file` (file) — The uploaded song file in `.wav` or `.mp3` format.
+
+**Sample Request:**
+```bash
+curl -X POST "http://localhost:8000/song/convert" \
+  -F "file=@your_song.mp3"
+```
+
+---
+
+### **Video Conversion APIs**
+---
+
+### 4. **Convert Video**
+**`POST /video/convert`**  
+> **Description:** Converts the uploaded video and regenerates voice if needed.
+
+**Request Parameters:**
+- `file` (file) — The uploaded video file in `.mp4` or `.mov`.
+- `is_music_video` (string) — Determines if the video is a music video for special handling. (`true` or `false`)
+
+**Sample Request:**
+```bash
+curl -X POST "http://localhost:8000/video/convert" \
+  -F "file=@your_video.mp4" \
+  -F "is_music_video=true"
+```
+
+---
+
+### 5. **Process Video**
+**`POST /process/`**  
+> **Description:** Processes a video file by translating and regenerating voice with the specified model.
+
+**Request Parameters:**
+- `video_file` (file) — The uploaded video file in `.mp4`.
+- `target_language` (string) — The language to translate the audio into. (Default: `th`)
+- `voice_model` (string) — The voice model for synthesized audio. Supported voices include: `alloy`, `ash`, `coral`, `echo`, `fable`, `onyx`, `nova`, `sage`, `shimmer`.
+
+**Sample Request:**
+```bash
+curl -X POST "http://localhost:8000/process/" \
+  -F "video_file=@your_video.mp4" \
+  -F "target_language=en" \
+  -F "voice_model=alloy"
+```
+
+---
+
+### **Text-to-Speech (TTS) API**
+---
+
+### 6. **Text-to-Speech**
+**`POST /tts`**  
+> **Description:** Generates speech audio from a provided text.
+
+**Request Parameters:**
+- `text` (string) — The text to be converted into speech.
+- `target_language` (string) — The language for the generated speech. (Default: `en`)
+- `voice_model` (string) — The voice model for generating the speech. Supported voices include: `alloy`, `ash`, `coral`, `echo`, `fable`, `onyx`, `nova`, `sage`, `shimmer`.
+
+**Sample Request:**
+```bash
+curl -X POST "http://localhost:8000/tts" \
+  -F "text=Hello world! This is a test sentence." \
+  -F "target_language=en" \
+  -F "voice_model=alloy"
+```
+
+---
+
+### **Health Check API**
+---
+
+### 7. **Health Check**
+**`GET /health_check`**  
+> **Description:** Verifies the server’s operational status.
+
+**Sample Request:**
+```bash
+curl -X GET "http://localhost:8000/health_check"
+```
+
+---
+
+## ⚙️ **Error Handling**
+All endpoints return clear error responses if issues arise.
+
+| Status Code | Description |
+|:-------------|:-------------|
+| `200 OK`      | Request successful |
+| `400 Bad Request` | Invalid request data |
+| `404 Not Found`   | Requested resource not found |
+| `500 Internal Server Error` | Server encountered an unexpected condition |
+
+
+
 ## Workflow
 1. **Input Processing:** Users upload multimedia content.
 2. **Speech-to-Text Conversion:** Audio is transcribed into text using Whisper.

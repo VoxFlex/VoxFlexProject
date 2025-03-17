@@ -107,5 +107,4 @@ class ToolService:
             raise HTTPException(status_code=500, detail=f"❌ Error: {str(e)}")
 
         finally:
-            # cleanup_files([output_path])
-            pass
+            cleanup_files([output_path])

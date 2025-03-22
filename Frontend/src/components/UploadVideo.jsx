@@ -1,15 +1,14 @@
 import React from "react";
-import { Box, Button, Typography, CircularProgress } from "@mui/material";
+import { Box, Button, Typography, CircularProgress  } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const UploadAudio = ({
+const UploadVideo = ({
   loading,
-  audioFile,
+  videoFile,
   handleFileChange,
   handleDelete,
-  originalAudioUrl, // Original Audio
-  convertedAudioUrl, // Converted Audio
+  previewVideoUrl, // แสดงวิดีโอที่อัปโหลด
 }) => {
   return (
     <Box
@@ -19,7 +18,7 @@ const UploadAudio = ({
         display: "flex",
         gap: 2,
         flexDirection: "column",
-        justifyContent: loading || !audioFile ? "center" : "flex-start", // ✅ อยู่ด้านบนสุดของแนว Y
+        justifyContent: loading || !videoFile ? "center" : "flex-start",
         alignItems: "center",
         padding: { xs: 3, md: 5 },
         border: "1px dashed #66798B",
@@ -27,10 +26,10 @@ const UploadAudio = ({
         boxShadow: "0px 20px 24px 4px rgba(170, 188, 204, 0.10)",
       }}
     >
-      {/* Loading Indicator */}
+      {/* File Upload Section */}
       {loading ? (
-        <CircularProgress size={40} />
-      ) : audioFile ? (
+       <CircularProgress size={40} />
+      ) : videoFile ? (
         <Box
           sx={{
             width: "100%",
@@ -40,9 +39,9 @@ const UploadAudio = ({
             alignItems: "center",
           }}
         >
-          {/* Audio Information with Delete Button */}
+          {/* Video Information */}
           <Box
-            className="audioBox"
+            className="videoBox"
             sx={{
               width: "100%",
               padding: 2,
@@ -54,7 +53,7 @@ const UploadAudio = ({
               borderRadius: "8px",
             }}
           >
-            <Typography variant="body1">📂 {audioFile.name}</Typography>
+            <Typography variant="body1">🎬 {videoFile.name}</Typography>
             <Button
               variant="outlined"
               color="error"
@@ -66,31 +65,33 @@ const UploadAudio = ({
             </Button>
           </Box>
 
-          {/* Original Audio Section */}
-          {originalAudioUrl && (
+          {/* Video Preview */}
+          {previewVideoUrl && (
             <Box
-              className="originalAudioBox"
+              className="previewVideoBox"
               sx={{
                 width: "100%",
-                border: "1px solid rgb(90, 104, 183)",
+                border: "2px solid rgba(87, 87, 87, 0.55)",
                 borderRadius: "8px",
                 padding: 2,
                 backgroundColor: "#E3F2FD",
-                display: "flex",
-                flexDirection: "column",
-                gap: 1,
               }}
             >
-              <Typography variant="body1" fontWeight="bold">
-                🎵 Original Audio
+              <Typography
+                variant="body1"
+                fontWeight="bold"
+                sx={{ textAlign: "center", marginBottom: 1 }}
+              >
+                🎥 Video Preview
               </Typography>
-              <audio
-                src={originalAudioUrl}
+              <video
+                src={previewVideoUrl}
                 controls
                 style={{
-                  width: "100%",
-                  border: "1px solid rgba(36, 37, 37, 0.27)",
-                  borderRadius: 30,
+                  width: "100%", // ✅ ปรับให้เต็มกรอบ
+                  maxHeight: "40vh", // ✅ จำกัดความสูงไม่ให้ใหญ่เกินไป
+                  borderRadius: "12px",
+                  objectFit: "contain", // ✅ ให้สัดส่วนวิดีโอแสดงผลได้ดี
                 }}
               />
             </Box>
@@ -108,11 +109,11 @@ const UploadAudio = ({
               borderRadius: "100px",
             }}
           >
-            UPLOAD AUDIO
+            UPLOAD VIDEO
             <input
               type="file"
               hidden
-              accept="audio/*"
+              accept="video/*"
               onChange={handleFileChange}
             />
           </Button>
@@ -123,40 +124,12 @@ const UploadAudio = ({
           >
             Click to Upload, or Drag and Drop
             <br />
-            Audio file up to 50MB
+            Video file up to 500MB
           </Typography>
-        </Box>
-      )}
-
-      {/* Converted Audio Section */}
-      {convertedAudioUrl && (
-        <Box
-          className="convertedAudioBox"
-          sx={{
-            width: "100%",
-            border: "1px solid rgb(102, 177, 105)",
-            borderRadius: "8px",
-            padding: 2,
-            backgroundColor: "#E8F5E9",
-            gap: 1,
-          }}
-        >
-          <Typography variant="body1" fontWeight="bold">
-            🎧 Converted Audio
-          </Typography>
-          <audio
-            src={convertedAudioUrl}
-            controls
-            style={{
-              width: "100%",
-              border: "1px solid rgba(36, 37, 37, 0.27)",
-              borderRadius: 30,
-            }}
-          />
         </Box>
       )}
     </Box>
   );
 };
 
-export default UploadAudio;
+export default UploadVideo;

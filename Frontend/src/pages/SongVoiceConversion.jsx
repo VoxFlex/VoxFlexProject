@@ -17,7 +17,7 @@ import "../components/Component.css";
 import UploadAudio from "../components/UploadAudio";
 import UploadModelButton from "../components/UploadModelButton";
 
-const VoiceConversion2 = () => {
+const SongVoiceConversion = () => {
   const [models, setModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState("Justin Bieber");
   const [isLoading, setIsLoading] = useState(false);
@@ -44,7 +44,7 @@ const VoiceConversion2 = () => {
     try {
       const modelSelected = await RVCApiService.selectModel(selectedModel);
       if (modelSelected) {
-        const response = await RVCApiService.convertVoice(audioFile);
+        const response = await RVCApiService.convertSong(audioFile);
         if (response?.audio_base64) {
           const audioBlob = new Blob(
             [
@@ -99,34 +99,42 @@ const VoiceConversion2 = () => {
   };
 
   return (
-    <Box sx={{ mt: 5, mx: { xs: 2, md: 25 }, mb: 8 }}>
+    <Box sx={{ mt: 5, mx: { xs: 2, md: 25 }, mb: 3 }}>
       {/* Header Section */}
-      <Box
+      {/* <Box
         sx={{
-          display: "flex", // เพิ่ม Flexbox
-          flexDirection: "column", // ให้เนื้อหาจัดเรียงในแนวตั้ง
-          justifyContent: "center", // จัดให้อยู่ตรงกลางแนวตั้ง
-          alignItems: "center", // จัดให้อยู่ตรงกลางแนวนอน
+          display: "flex", // ใช้ Flexbox เพื่อควบคุมการจัดวาง
+          alignItems: "center", // จัดให้อยู่กึ่งกลางแนวแกน Y
+          justifyContent: "center", // จัดให้อยู่กึ่งกลางแนวแกน X (ถ้าต้องการ)
           borderRadius: 2,
           boxShadow: 3,
           background: "linear-gradient(90deg, #D9F1FF 0%, #EADBF5 100%)",
           textAlign: "center",
-          padding: { xs: 2, md: 4 },
-          minHeight: { xs: "15vh", md: "20vh" }, // ปรับขนาดให้เหมาะสม
+          minHeight: { xs: "15vh", md: "38vh" }, // เพิ่มความสูงให้เต็มมากขึ้น
+          width: "100%", // ให้ Box กว้างเต็มจอ
+          overflow: "hidden", // ตัดขอบภาพส่วนเกิน
+        }}
+      > */}
+      <div
+        style={{
+          display: "flex", // ใช้ Flexbox เพื่อควบคุมการจัดวาง
+          alignItems: "center", // จัดให้อยู่กึ่งกลางแนวแกน Y
+          justifyContent: "center", // จัดให้อยู่กึ่งกลางแนวแกน X (ถ้าต้องการ)
         }}
       >
-        <Typography variant="h4" fontWeight="bold">
-          Limitless Voice Transformation
-        </Typography>
-        <Typography variant="body1">
-          Convert your vocals with royalty-free voices, train custom voices, and
-          create copyright-free cover vocals—unlock endless creative
-          possibilities!
-        </Typography>
-      </Box>
+        <img
+          src="../../image/songConvertionInfo.svg"
+          alt="Info Box"
+          style={{
+            width: "90%",
+            objectFit: "contain", // ✅ ให้ภาพเต็ม Box โดยไม่ถูกตัด
+          }}
+        />
+      </div>
+      {/* </Box> */}
 
       {/* Content Section */}
-      <Grid container spacing={3} sx={{ mt: 1, pb: 10, alignItems: "center" }}>
+      <Grid container spacing={3} sx={{ pb: 10, alignItems: "flex-start" }}>
         {/* Voice Model Card */}
         <Grid item xs={12} md={5} sx={{ height: { xs: "auto", md: "42vh" } }}>
           <Card
@@ -136,13 +144,14 @@ const VoiceConversion2 = () => {
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
-              padding: { xs: 3, md: 5 },
+              padding: { xs: 2, sm: 3, md: 4, lg: 5 },
+              gap: 1,
             }}
           >
             <div>
               <Typography
                 variant="subtitle1"
-                color="#007AFB"
+                color="#007AFF"
                 sx={{ fontWeight: "bold", marginBottom: 2 }}
               >
                 Select Voice Models
@@ -160,7 +169,6 @@ const VoiceConversion2 = () => {
                   ))}
                 </Select>
               </FormControl>
-
               <UploadModelButton />
             </div>
             <Box
@@ -186,7 +194,7 @@ const VoiceConversion2 = () => {
                   disabled={!audioFile || !selectedModel || isLoading}
                   onClick={handleConvert}
                 >
-                  GENERATE SPEECH
+                  GENERATE SONG
                 </Button>
               </div>
             </Box>
@@ -209,4 +217,4 @@ const VoiceConversion2 = () => {
   );
 };
 
-export default VoiceConversion2;
+export default SongVoiceConversion;

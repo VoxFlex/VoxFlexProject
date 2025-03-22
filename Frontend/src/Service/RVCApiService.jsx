@@ -90,6 +90,48 @@ const RVCApiService = {
       return null;
     }
   },
+
+  async convertSong(file) {
+    if (!file) {
+      console.error("❌ No song file provided for conversion");
+      return null;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await axios.post(`${BASE_URL}/song/convert`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      console.log("✅ Song Converted!", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("❌ Error converting song:", error);
+      return null;
+    }
+  },
+
+  async convertVideo(file) {
+    if (!file) {
+      console.error("❌ No file provided for video conversion");
+      return null;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await axios.post(`${BASE_URL}/video/convert`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      console.log("✅ Video Converted!", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("❌ Error converting video:", error);
+      return null;
+    }
+  },
 };
 
 export default RVCApiService;

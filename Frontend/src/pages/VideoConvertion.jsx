@@ -14,16 +14,15 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DownloadIcon from "@mui/icons-material/Download";
 import RVCApiService from "../Service/RVCApiService";
 import "../components/Component.css";
-import UploadAudio from "../components/UploadAudio";
+import UploadVideo from "../components/UploadVideo";
 import UploadModelButton from "../components/UploadModelButton";
 
-const VoiceConversion2 = () => {
+const VideoConvertion = () => {
   const [models, setModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState("Justin Bieber");
   const [isLoading, setIsLoading] = useState(false);
-  const [audioFile, setAudioFile] = useState(null); //  ใช้เก็บไฟล์เสียงที่ผู้ใช้อัปโหลด และใช้เป็นอินพุตในการแปลงเสียง
-  const [originalAudioUrl, setOriginalAudioUrl] = useState(null); // → ใช้สำหรับเปิดเล่น เสียงต้นฉบับ
-  const [convertedAudioUrl, setConvertedAudioUrl] = useState(null); // → ใช้สำหรับเปิดเล่น เสียงที่แปลงแล้ว
+  const [videoFile, setVideoFile] = useState(null); // ไฟล์วิดีโอที่อัปโหลด
+  const [previewVideoUrl, setPreviewVideoUrl] = useState(null); // URL วิดีโอที่จะแสดง
 
   useEffect(() => {
     const fetchModels = async () => {
@@ -34,8 +33,8 @@ const VoiceConversion2 = () => {
   }, []);
 
   const handleConvert = async () => {
-    if (!audioFile || !selectedModel) {
-      alert("Please select a model and an audio file.");
+    if (!videoFile || !selectedModel) {
+      alert("Please select a model and a video file.");
       return;
     }
 
@@ -44,20 +43,20 @@ const VoiceConversion2 = () => {
     try {
       const modelSelected = await RVCApiService.selectModel(selectedModel);
       if (modelSelected) {
-        const response = await RVCApiService.convertVoice(audioFile);
-        if (response?.audio_base64) {
-          const audioBlob = new Blob(
+        const response = await RVCApiService.convertVideo(videoFile);
+        if (response?.video_base64) {
+          const videoBlob = new Blob(
             [
-              Uint8Array.from(atob(response.audio_base64), (c) =>
+              Uint8Array.from(atob(response.video_base64), (c) =>
                 c.charCodeAt(0)
               ),
             ],
-            { type: "audio/wav" }
+            { type: "video/mp4" }
           );
-          const audioUrl = URL.createObjectURL(audioBlob);
-          setConvertedAudioUrl(audioUrl); // Show only after Generate Speech
+          const videoUrl = URL.createObjectURL(videoBlob);
+          setPreviewVideoUrl(videoUrl); // แสดงวิดีโอที่แปลงแล้ว
         } else {
-          alert("Failed to process the audio.");
+          alert("Failed to process the video.");
         }
       } else {
         alert("Failed to select model.");
@@ -71,31 +70,35 @@ const VoiceConversion2 = () => {
   };
 
   const handleDownload = () => {
-    if (!convertedAudioUrl) return;
+    if (!previewVideoUrl) return;
     const link = document.createElement("a");
-    link.href = convertedAudioUrl;
-    link.download = "converted_audio.wav";
+    link.href = previewVideoUrl;
+    link.download = "converted_video.mp4";
     link.click();
   };
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
+      const allowedFormats = ["video/mp4", "video/quicktime"];
+      if (!allowedFormats.includes(file.type)) {
+        alert("Invalid file format. Please upload an MP4 or MOV file.");
+        return;
+      }
+
       setIsLoading(true);
 
       setTimeout(() => {
-        setAudioFile(file);
-        setOriginalAudioUrl(URL.createObjectURL(file)); // Show Original Only
-        setConvertedAudioUrl(null); // Reset Converted Audio
+        setVideoFile(file);
+        setPreviewVideoUrl(URL.createObjectURL(file)); // Show original video
         setIsLoading(false);
       }, 2000);
     }
   };
 
   const handleDelete = () => {
-    setAudioFile(null);
-    setOriginalAudioUrl(null);
-    setConvertedAudioUrl(null);
+    setVideoFile(null);
+    setPreviewVideoUrl(null);
   };
 
   return (
@@ -103,32 +106,35 @@ const VoiceConversion2 = () => {
       {/* Header Section */}
       <Box
         sx={{
-          display: "flex", // เพิ่ม Flexbox
-          flexDirection: "column", // ให้เนื้อหาจัดเรียงในแนวตั้ง
-          justifyContent: "center", // จัดให้อยู่ตรงกลางแนวตั้ง
-          alignItems: "center", // จัดให้อยู่ตรงกลางแนวนอน
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
           borderRadius: 2,
           boxShadow: 3,
           background: "linear-gradient(90deg, #D9F1FF 0%, #EADBF5 100%)",
           textAlign: "center",
           padding: { xs: 2, md: 4 },
-          minHeight: { xs: "15vh", md: "20vh" }, // ปรับขนาดให้เหมาะสม
+          minHeight: { xs: "15vh", md: "20vh" },
         }}
       >
         <Typography variant="h4" fontWeight="bold">
-          Limitless Voice Transformation
+          Limitless Video Transformation
         </Typography>
         <Typography variant="body1">
-          Convert your vocals with royalty-free voices, train custom voices, and
-          create copyright-free cover vocals—unlock endless creative
-          possibilities!
+          Convert your videos with royalty-free voices, train custom voices, and
+          create copyright-free videos—unlock endless creative possibilities!
         </Typography>
       </Box>
 
       {/* Content Section */}
-      <Grid container spacing={3} sx={{ mt: 1, pb: 10, alignItems: "center" }}>
+      <Grid
+        container
+        spacing={3}
+        sx={{ mt: 1, pb: 5, alignItems: "flex-start" }}
+      >
         {/* Voice Model Card */}
-        <Grid item xs={12} md={5} sx={{ height: { xs: "auto", md: "42vh" } }}>
+        <Grid item xs={12} md={4.5} sx={{ height: { xs: "auto", md: "auto" } }}>
           <Card
             className="cardInput"
             sx={{
@@ -136,9 +142,11 @@ const VoiceConversion2 = () => {
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
-              padding: { xs: 3, md: 5 },
+              padding: { xs: 2, sm: 3, md: 4, lg: 5 },
+              gap: 1,
             }}
           >
+            {/** Select Voice Models */}
             <div>
               <Typography
                 variant="subtitle1"
@@ -152,6 +160,10 @@ const VoiceConversion2 = () => {
                 <Select
                   value={selectedModel}
                   onChange={(e) => setSelectedModel(e.target.value)}
+                  sx={{
+                    minHeight: "45px", // 🔥 Consistent height for select box
+                    borderRadius: "8px",
+                  }}
                 >
                   {models.map((model, index) => (
                     <MenuItem key={index} value={model}>
@@ -160,14 +172,17 @@ const VoiceConversion2 = () => {
                   ))}
                 </Select>
               </FormControl>
-
               <UploadModelButton />
             </div>
+
+            {/* Back Download Generate Button */}
             <Box
               sx={{
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                flexDirection: { xs: "column", sm: "row" },
+                gap: { xs: 1, sm: 2 },
               }}
             >
               <Button variant="outlined" onClick={() => window.history.back()}>
@@ -179,29 +194,29 @@ const VoiceConversion2 = () => {
                   color="primary"
                   startIcon={<DownloadIcon />}
                   onClick={handleDownload}
-                  disabled={!convertedAudioUrl}
+                  disabled={!previewVideoUrl}
                 />
                 <Button
                   variant="contained"
-                  disabled={!audioFile || !selectedModel || isLoading}
+                  disabled={!videoFile || !selectedModel || isLoading}
                   onClick={handleConvert}
                 >
-                  GENERATE SPEECH
+                  GENERATE VIDEO
                 </Button>
               </div>
+              {/* Back Download Generate Button */}
             </Box>
           </Card>
         </Grid>
 
-        {/* Upload Audio Card */}
-        <Grid item xs={12} md={7} sx={{ height: { xs: "auto", md: "42vh" } }}>
-          <UploadAudio
+        {/* Upload Video Card */}
+        <Grid item xs={12} md={7.5} sx={{ height: { xs: "auto", md: "60vh" } }}>
+          <UploadVideo
             loading={isLoading}
-            audioFile={audioFile}
+            videoFile={videoFile}
             handleFileChange={handleFileChange}
             handleDelete={handleDelete}
-            originalAudioUrl={originalAudioUrl} // New Original Audio URL
-            convertedAudioUrl={convertedAudioUrl} // New Audio URL after Generate
+            previewVideoUrl={previewVideoUrl} // แสดงวิดีโอที่อัปโหลด
           />
         </Grid>
       </Grid>
@@ -209,4 +224,4 @@ const VoiceConversion2 = () => {
   );
 };
 
-export default VoiceConversion2;
+export default VideoConvertion;

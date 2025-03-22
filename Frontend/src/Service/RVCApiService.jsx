@@ -69,6 +69,27 @@ const RVCApiService = {
       return null;
     }
   },
+
+  async uploadModel(file) {
+    if (!file) {
+      console.error("❌ No file provided for model upload");
+      return null;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await axios.post(`${BASE_URL}/models/upload`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      console.log("✅ Model Uploaded Successfully!", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("❌ Error uploading model:", error);
+      return null;
+    }
+  },
 };
 
 export default RVCApiService;

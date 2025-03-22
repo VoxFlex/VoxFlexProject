@@ -1,0 +1,18 @@
+.cardInput {
+  border-radius: 14px;
+  border: 1px solid #dfdfdf;
+  background: #f9fafb;
+  box-shadow: 0px 20px 24px 4px rgba(170, 188, 204, 0.1);
+}
+
+.cardDisplay {
+  border-radius: 12px;
+  border: 1px dashed #66798b;
+  background: #f9fafb;
+  box-shadow: 0px 20px 24px 4px rgba(170, 188, 204, 0.1);
+}
+
+.audioBox {
+  border-radius: 14px;
+  border: 1px solid var(--black-38, rgba(0, 0, 0, 0.38));
+}

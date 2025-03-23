@@ -311,23 +311,22 @@ const VideoTranslation = () => {
             <Select
               displayEmpty
               value={translateTo}
-              onChange={(e) => setTranslateTo(e.target.value)}
+              onChange={(e) => {
+                console.log(e.target.value); // เช็คว่าค่าออกมาตรงไหม
+                return setTranslateTo(e.target.value);
+              }}
               renderValue={(selected) => {
                 if (!selected) return "Select Language (Default Thai)";
-                // Map the value to the display label
-                const languageMap = {
-                  th: "Thai",
-                  en: "English",
-                  fr: "French",
-                  de: "German",
-                };
-                return languageMap[selected] || selected;
+                return LanguageMapper[selected] || selected;
               }}
             >
-              <MenuItem value="th">Thai</MenuItem>
-              <MenuItem value="en">English</MenuItem>
-              <MenuItem value="fr">French</MenuItem>
-              <MenuItem value="de">German</MenuItem>
+              {Object.entries(LanguageMapper)
+                .slice(1)
+                .map(([code, language]) => (
+                  <MenuItem key={code} value={code}>
+                    {language}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
 

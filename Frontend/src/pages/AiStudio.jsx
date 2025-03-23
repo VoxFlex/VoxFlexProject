@@ -52,7 +52,7 @@ const AiStudio = () => {
     {
       id: "audio-translation",
       icon: ChatIcon,
-      title: "Audio Translation (Coming Soon)",
+      title: "Audio Translation",
       description: "Translate Audio with AI",
       link: "/audio-translation",
       category: "audio",
@@ -68,7 +68,7 @@ const AiStudio = () => {
     {
       id: "text-speech",
       icon: TextSnippetIcon,
-      title: "Text to Speech (Coming Soon)",
+      title: "Text to Speech ",
       description: "Convert text to speech",
       link: "/text-speech",
       category: "text",
@@ -112,10 +112,10 @@ const AiStudio = () => {
                   feature.id === "video-translator" ||
                   feature.id === "voice-converter" ||
                   feature.id === "song-voice" ||
-                  feature.id === "video-dubbing"
-                    ? // feature.id === "video-translator" || feature.id === "video-dubbing"
-
-                      "#f8faff"
+                  feature.id === "video-dubbing" ||
+                  feature.id === "audio-translation" ||
+                  feature.id === "text-speech"
+                    ? "#f8faff"
                     : "#f5f4f2",
                 "&:hover": {
                   boxShadow: 3,

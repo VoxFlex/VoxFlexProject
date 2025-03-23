@@ -118,7 +118,7 @@ const UploadAudio = ({
           </Button>
 
           <Typography
-            variant="body2"
+            variant="subtitle2"
             sx={{ marginTop: 2, textAlign: "center" }}
           >
             Click to Upload, or Drag and Drop

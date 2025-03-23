@@ -145,6 +145,7 @@ import DownloadIcon from "@mui/icons-material/Download";
 import AddIcon from "@mui/icons-material/Add";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { uploadVideoToServer } from "../Service/apiService";
+import LanguageMapper from "../Service/languageMapper";
 
 const VideoTranslation = () => {
   const [originalLanguage, setOriginalLanguage] = useState("");
@@ -163,8 +164,17 @@ const VideoTranslation = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-
   const handleFileChange = async (event) => {
+    if (!originalLanguage) {
+      setOriginalLanguage("auto");
+    }
+    if (!translateTo) {
+      setTranslateTo("th");
+    }
+    if (!speaker) {
+      setSpeaker("alloy");
+    }
+
     const file = event.target.files[0];
     if (!file) return; // ถ้าไม่มีไฟล์ให้ return ออกไป
 
@@ -244,11 +254,14 @@ const VideoTranslation = () => {
           <Typography variant="subtitle1" gutterBottom>
             Original Language
           </Typography>
-          <FormControl fullWidth sx={{ marginBottom: 2 }} variant="outlined">
+          {/* <FormControl fullWidth sx={{ marginBottom: 2 }} variant="outlined">
             <Select
               displayEmpty
               value={originalLanguage}
-              onChange={(e) => setOriginalLanguage(e.target.value)}
+              onChange={(e) => {
+                console.log(e.target.value);
+                return setOriginalLanguage(e.target.value);
+              }}
               renderValue={(selected) => {
                 if (!selected)
                   return "Select Language (Default Voice Detection)";
@@ -265,6 +278,28 @@ const VideoTranslation = () => {
               <MenuItem value="Thai">Thai</MenuItem>
               <MenuItem value="English">English</MenuItem>
               <MenuItem value="Spanish">Spanish</MenuItem>
+            </Select>
+          </FormControl> */}
+
+          <FormControl fullWidth sx={{ marginBottom: 2 }} variant="outlined">
+            <Select
+              displayEmpty
+              value={originalLanguage}
+              onChange={(e) => {
+                console.log(e.target.value); // เช็คว่าค่าออกมาตรงไหม
+                return setOriginalLanguage(e.target.value);
+              }}
+              renderValue={(selected) => {
+                if (!selected)
+                  return "Select Language (Default Voice Detection)";
+                return LanguageMapper[selected] || selected;
+              }}
+            >
+              {Object.entries(LanguageMapper).map(([code, language]) => (
+                <MenuItem key={code} value={code}>
+                  {language}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
 
@@ -306,9 +341,9 @@ const VideoTranslation = () => {
               value={speaker}
               onChange={(e) => setSpeaker(e.target.value)}
               renderValue={(selected) => {
-                if (!selected) return "Select Speaker (Default Alley)";
+                if (!selected) return "Select Speaker (Default Alloy)";
                 const speakerMap = {
-                  alley: "Alley",
+                  alloy: "Alloy",
                   ash: "Ash",
                   coral: "Coral",
                   echo: "Echo",
@@ -321,7 +356,7 @@ const VideoTranslation = () => {
                 return speakerMap[selected] || selected;
               }}
             >
-              <MenuItem value="alley">Alley</MenuItem>
+              <MenuItem value="alloy">Alloy</MenuItem>
               <MenuItem value="ash">Ash</MenuItem>
               <MenuItem value="coral">Coral</MenuItem>
               <MenuItem value="echo">Echo</MenuItem>

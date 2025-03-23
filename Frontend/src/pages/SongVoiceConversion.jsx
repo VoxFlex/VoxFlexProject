@@ -21,7 +21,7 @@ const SongVoiceConversion = () => {
   const [models, setModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState("Justin Bieber");
   const [isLoading, setIsLoading] = useState(false);
-  const [audioFile, setAudioFile] = useState(null); //  ใช้เก็บไฟล์เสียงที่ผู้ใช้อัปโหลด และใช้เป็นอินพุตในการแปลงเสียง
+  const [audioFile, setAudioFile] = useState(null); // → ใช้เก็บไฟล์เสียงที่ผู้ใช้อัปโหลด และใช้เป็นอินพุตในการแปลงเสียง
   const [originalAudioUrl, setOriginalAudioUrl] = useState(null); // → ใช้สำหรับเปิดเล่น เสียงต้นฉบับ
   const [convertedAudioUrl, setConvertedAudioUrl] = useState(null); // → ใช้สำหรับเปิดเล่น เสียงที่แปลงแล้ว
 
@@ -115,18 +115,19 @@ const SongVoiceConversion = () => {
           overflow: "hidden", // ตัดขอบภาพส่วนเกิน
         }}
       > */}
-      <div
+      <div 
         style={{
           display: "flex", // ใช้ Flexbox เพื่อควบคุมการจัดวาง
           alignItems: "center", // จัดให้อยู่กึ่งกลางแนวแกน Y
           justifyContent: "center", // จัดให้อยู่กึ่งกลางแนวแกน X (ถ้าต้องการ)
+          
         }}
       >
         <img
           src="../../image/songConvertionInfo.svg"
           alt="Info Box"
           style={{
-            width: "90%",
+            width: "100%",
             objectFit: "contain", // ✅ ให้ภาพเต็ม Box โดยไม่ถูกตัด
           }}
         />

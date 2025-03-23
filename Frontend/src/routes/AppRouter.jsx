@@ -10,7 +10,9 @@ const VideoDubbing = lazy(() => import("../pages/VideoDubbing.jsx"));
 const SongVoiceConversion = lazy(() => import("../pages/SongVoiceConversion.jsx"));
 const VoiceConversion2 = lazy(() => import("../pages/VoiceConvertion2.jsx"));
 const VideoConvertion = lazy(() => import("../pages/VideoConvertion.jsx"));
+const AudioTranslation = lazy(() => import("../pages/AudioTranslation.jsx"));
 
+// link: "/text-speech",
 const AppRouter = () => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
@@ -24,6 +26,7 @@ const AppRouter = () => {
         <Route path="/video-dubbing" element={<VideoConvertion />} />
         <Route path="/voice-converter" element={<VoiceConversion2/>} />
         <Route path="/song-voice" element={<SongVoiceConversion/>} />
+        <Route path="/audio-translation" element={<AudioTranslation/>} />
         {/* About route */}
         <Route path="about" element={<About />} />
       </Routes>

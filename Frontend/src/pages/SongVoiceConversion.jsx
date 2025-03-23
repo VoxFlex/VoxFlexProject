@@ -101,20 +101,6 @@ const SongVoiceConversion = () => {
   return (
     <Box sx={{ mt: 5, mx: { xs: 2, md: 25 }, mb: 3 }}>
       {/* Header Section */}
-      {/* <Box
-        sx={{
-          display: "flex", // ใช้ Flexbox เพื่อควบคุมการจัดวาง
-          alignItems: "center", // จัดให้อยู่กึ่งกลางแนวแกน Y
-          justifyContent: "center", // จัดให้อยู่กึ่งกลางแนวแกน X (ถ้าต้องการ)
-          borderRadius: 2,
-          boxShadow: 3,
-          background: "linear-gradient(90deg, #D9F1FF 0%, #EADBF5 100%)",
-          textAlign: "center",
-          minHeight: { xs: "15vh", md: "38vh" }, // เพิ่มความสูงให้เต็มมากขึ้น
-          width: "100%", // ให้ Box กว้างเต็มจอ
-          overflow: "hidden", // ตัดขอบภาพส่วนเกิน
-        }}
-      > */}
       <div 
         style={{
           display: "flex", // ใช้ Flexbox เพื่อควบคุมการจัดวาง
@@ -135,7 +121,7 @@ const SongVoiceConversion = () => {
       {/* </Box> */}
 
       {/* Content Section */}
-      <Grid container spacing={3} sx={{ pb: 10, alignItems: "flex-start" }}>
+      <Grid container spacing={3} sx={{ pb: 10, alignItems: "flex-start" , mb: 6}}>
         {/* Voice Model Card */}
         <Grid item xs={12} md={5} sx={{ height: { xs: "auto", md: "42vh" } }}>
           <Card

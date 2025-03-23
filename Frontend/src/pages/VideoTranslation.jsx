@@ -254,32 +254,6 @@ const VideoTranslation = () => {
           <Typography variant="subtitle1" gutterBottom>
             Original Language
           </Typography>
-          {/* <FormControl fullWidth sx={{ marginBottom: 2 }} variant="outlined">
-            <Select
-              displayEmpty
-              value={originalLanguage}
-              onChange={(e) => {
-                console.log(e.target.value);
-                return setOriginalLanguage(e.target.value);
-              }}
-              renderValue={(selected) => {
-                if (!selected)
-                  return "Select Language (Default Voice Detection)";
-                const languageMap = {
-                  th: "Thai",
-                  en: "English",
-                  fr: "French",
-                  de: "German",
-                };
-                return languageMap[selected] || selected;
-              }}
-            >
-              <MenuItem value="Voice Detection">Voice Detection</MenuItem>
-              <MenuItem value="Thai">Thai</MenuItem>
-              <MenuItem value="English">English</MenuItem>
-              <MenuItem value="Spanish">Spanish</MenuItem>
-            </Select>
-          </FormControl> */}
 
           <FormControl fullWidth sx={{ marginBottom: 2 }} variant="outlined">
             <Select

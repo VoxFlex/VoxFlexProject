@@ -102,7 +102,7 @@ const VideoConvertion = () => {
   };
 
   return (
-    <Box sx={{ mt: 5, mx: { xs: 2, md: 25 }, mb: 8 }}>
+    <Box sx={{ mt: 5, mx: { xs: 2, md: 25 }, mb: 12 }}>
       {/* Header Section */}
       <Box
         sx={{

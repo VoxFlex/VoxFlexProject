@@ -50,13 +50,6 @@ class VideoService:
             print(f"Translated audio saved at: {paths['translated_audio']}")
             print("service voice model: ", voice_model)
 
-            # run_inference(
-            #     video_path=paths["video"],
-            #     audio_path=paths["translated_audio"],
-            #     output_path=paths["output_video"],
-            #     checkpoint_path=os.path.join(base_dir, "../../Easy-Wav2Lip/checkpoints/Wav2Lip.pth"),
-            # )
-            
             # Step 5: Combine translated audio with video without audio
             combine_video_and_audio(
                 video_no_audio_path=paths["no_audio_video"],

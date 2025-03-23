@@ -91,134 +91,230 @@ The backend API, powered by **FastAPI**, provides a range of endpoints to suppor
 
 ---
 
-### 🚀 API Endpoints
+# 📄 VoxFlex API Documentation
 
-### **Voice Conversion APIs**
+## 📋 Table of Contents
+1. [Voice Conversion](#voice-conversion)
+2. [Song Conversion](#song-conversion)
+3. [Audio Translation](#audio-translation)
+4. [Video Conversion](#video-conversion)
+5. [Video Translation](#video-translation)
+6. [Text-to-Speech (TTS)](#text-to-speech-tts)
+7. [Model Management](#model-management)
+8. [Health Check](#health-check)
 
-### 1. **Convert Voice**
-**`POST /voice/convert`**  
-> **Description:** Converts the uploaded voice file using the selected model.
+---
 
-**Request Parameters:**
-- `file` (file) — The uploaded audio file in `.wav` or `.mp3` format.
+## 🔊 Voice Conversion
+### **Endpoint**
+```
+POST /voice/convert
+```
 
-**Sample Request:**
+### **Request Parameters**
+| Parameter | Type        | Description              | Required |
+|------------|-------------|--------------------------|-----------|
+| `file`       | `file`      | Audio file (`.wav`, `.mp3`) | ✅ Yes |
+
+### **Sample Request**
 ```bash
-curl -X POST "http://localhost:8000/voice/convert" \
-  -F "file=@your_audio.wav"
+curl -X POST -F "file=@audio_sample.wav" http://localhost:8000/voice/convert
+```
+
+### **Sample Response**
+```json
+{
+  "output_file": "processed_audio.wav",
+  "message": "✅ Voice converted successfully."
+}
 ```
 
 ---
 
-### 2. **Voice Translation**
-**`POST /voice/translate`**  
-> **Description:** Translates uploaded audio into the desired language and generates a new voiceover.
+## 🎵 Song Conversion
+### **Endpoint**
+```
+POST /song/convert
+```
 
-**Request Parameters:**
-- `audio_file` (file) — The uploaded audio file in `.wav` or `.mp3`.
-- `target_language` (string) — The language to translate the audio into. (Default: `en`)
-- `voice_model` (string) — The voice model for the translation. Supported models: `alloy`, `ash`, `coral`, `echo`, `fable`, `onyx`, `nova`, `sage`, `shimmer`.
+### **Request Parameters**
+| Parameter | Type        | Description              | Required |
+|------------|-------------|--------------------------|-----------|
+| `file`       | `file`      | Audio file (`.wav`, `.mp3`) | ✅ Yes |
 
-**Sample Request:**
+### **Sample Request**
 ```bash
-curl -X POST "http://localhost:8000/voice/translate" \
-  -F "audio_file=@your_audio.wav" \
-  -F "target_language=th" \
-  -F "voice_model=alloy"
+curl -X POST -F "file=@song_sample.mp3" http://localhost:8000/song/convert
+```
+
+### **Sample Response**
+```json
+{
+  "output_file": "converted_song.mp3",
+  "message": "✅ Song converted successfully."
+}
 ```
 
 ---
 
-### **Song Conversion API**
----
+## 🎧 Audio Translation
+### **Endpoint**
+```
+POST /audio/translate
+```
 
-### 3. **Convert Song**
-**`POST /song/convert`**  
-> **Description:** Converts the uploaded song file using the selected voice model.
+### **Request Parameters**
+| Parameter        | Type        | Description               | Required |
+|------------------|-------------|---------------------------|-----------|
+| `file`            | `file`      | Audio file (`.wav`, `.mp3`) | ✅ Yes |
+| `target_language` | `string`    | Target language             | ✅ Yes |
+| `voice_model`     | `string`    | Voice model for TTS         | ✅ Yes |
 
-**Request Parameters:**
-- `file` (file) — The uploaded song file in `.wav` or `.mp3` format.
-
-**Sample Request:**
+### **Sample Request**
 ```bash
-curl -X POST "http://localhost:8000/song/convert" \
-  -F "file=@your_song.mp3"
+curl -X POST -F "file=@audio_sample.wav" \
+-F "target_language=en" \
+-F "voice_model=alloy" \
+http://localhost:8000/audio/translate
+```
+
+### **Sample Response**
+```json
+{
+  "translated_audio": "translated_audio.wav",
+  "message": "✅ Audio translated successfully."
+}
 ```
 
 ---
 
-### **Video Conversion APIs**
----
+## 🎬 Video Conversion
+### **Endpoint**
+```
+POST /video/convert
+```
 
-### 4. **Convert Video**
-**`POST /video/convert`**  
-> **Description:** Converts the uploaded video and regenerates voice if needed.
+### **Request Parameters**
+| Parameter         | Type        | Description                 | Required |
+|-------------------|-------------|-----------------------------|-----------|
+| `file`             | `file`      | Video file (`.mp4`, `.mov`) | ✅ Yes |
+| `is_music_video`   | `boolean`   | Mark if video is a music video | ❌ Optional |
 
-**Request Parameters:**
-- `file` (file) — The uploaded video file in `.mp4` or `.mov`.
-- `is_music_video` (string) — Determines if the video is a music video for special handling. (`true` or `false`)
-
-**Sample Request:**
+### **Sample Request**
 ```bash
-curl -X POST "http://localhost:8000/video/convert" \
-  -F "file=@your_video.mp4" \
-  -F "is_music_video=true"
+curl -X POST -F "file=@video_sample.mp4" \
+-F "is_music_video=true" \
+http://localhost:8000/video/convert
+```
+
+### **Sample Response**
+```json
+{
+  "output_file": "converted_video.mp4",
+  "message": "✅ Video converted successfully."
+}
 ```
 
 ---
 
-### 5. **Process Video**
-**`POST /process/`**  
-> **Description:** Processes a video file by translating and regenerating voice with the specified model.
+## 🎥 Video Translation
+### **Endpoint**
+```
+POST /video/translate
+```
 
-**Request Parameters:**
-- `video_file` (file) — The uploaded video file in `.mp4`.
-- `target_language` (string) — The language to translate the audio into. (Default: `th`)
-- `voice_model` (string) — The voice model for synthesized audio. Supported voices include: `alloy`, `ash`, `coral`, `echo`, `fable`, `onyx`, `nova`, `sage`, `shimmer`.
+### **Request Parameters**
+| Parameter         | Type        | Description                 | Required |
+|-------------------|-------------|-----------------------------|-----------|
+| `file`             | `file`      | Video file (`.mp4`, `.mov`) | ✅ Yes |
+| `target_language`  | `string`    | Target language              | ✅ Yes |
+| `voice_model`      | `string`    | Voice model for TTS          | ✅ Yes |
 
-**Sample Request:**
+### **Sample Request**
 ```bash
-curl -X POST "http://localhost:8000/process/" \
-  -F "video_file=@your_video.mp4" \
-  -F "target_language=en" \
-  -F "voice_model=alloy"
+curl -X POST -F "file=@video_sample.mp4" \
+-F "target_language=en" \
+-F "voice_model=alloy" \
+http://localhost:8000/video/translate
+```
+
+### **Sample Response**
+```json
+{
+  "translated_video": "translated_video.mp4",
+  "message": "✅ Video translated successfully."
+}
 ```
 
 ---
 
-### **Text-to-Speech (TTS) API**
----
+## 🗣️ Text-to-Speech (TTS)
+### **Endpoint**
+```
+POST /tts
+```
 
-### 6. **Text-to-Speech**
-**`POST /tts`**  
-> **Description:** Generates speech audio from a provided text.
+### **Request Parameters**
+| Parameter         | Type        | Description                 | Required |
+|-------------------|-------------|-----------------------------|-----------|
+| `text`             | `string`    | Text to convert to speech    | ✅ Yes |
+| `target_language`  | `string`    | Target language for speech   | ✅ Yes |
+| `voice_model`      | `string`    | Desired voice model          | ✅ Yes |
 
-**Request Parameters:**
-- `text` (string) — The text to be converted into speech.
-- `target_language` (string) — The language for the generated speech. (Default: `en`)
-- `voice_model` (string) — The voice model for generating the speech. Supported voices include: `alloy`, `ash`, `coral`, `echo`, `fable`, `onyx`, `nova`, `sage`, `shimmer`.
-
-**Sample Request:**
+### **Sample Request**
 ```bash
-curl -X POST "http://localhost:8000/tts" \
-  -F "text=Hello world! This is a test sentence." \
-  -F "target_language=en" \
-  -F "voice_model=alloy"
+curl -X POST -F "text=Hello, this is VoxFlex!" \
+-F "target_language=en" \
+-F "voice_model=alloy" \
+http://localhost:8000/tts
+```
+
+### **Sample Response**
+```json
+{
+  "audio_file": "generated_speech.wav",
+  "message": "✅ TTS audio generated successfully."
+}
 ```
 
 ---
 
-### **Health Check API**
+## 🛠️ Model Management
+### **Upload Model**
+```
+POST /models/upload
+```
+
+### **List Models**
+```
+GET /models
+```
+
+### **Select Model**
+```
+POST /models/select
+```
+
 ---
 
-### 7. **Health Check**
-**`GET /health_check`**  
-> **Description:** Verifies the server’s operational status.
-
-**Sample Request:**
-```bash
-curl -X GET "http://localhost:8000/health_check"
+## 🔎 Health Check
+### **Endpoint**
 ```
+GET /health_check
+```
+
+### **Sample Request**
+```bash
+curl -X GET http://localhost:8000/health_check
+```
+
+### **Sample Response**
+```json
+{
+  "status": "✅ System operational."
+}
+```
+
 
 ---
 

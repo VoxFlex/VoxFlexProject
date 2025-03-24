@@ -102,7 +102,7 @@ const VideoConvertion = () => {
   };
 
   return (
-    <Box sx={{ mt: 5, mx: { xs: 2, md: 25 }, mb: 12 }}>
+    <Box sx={{ mt: 5, mx: { xs: 2, md: 15 }, mb: 12 }}>
       {/* Header Section */}
       <Box
         sx={{
@@ -134,7 +134,7 @@ const VideoConvertion = () => {
         sx={{ mt: 1, pb: 5, alignItems: "flex-start" }}
       >
         {/* Voice Model Card */}
-        <Grid item xs={12} md={4.5} sx={{ height: { xs: "auto", md: "auto" } }}>
+        <Grid item xs={12} md={5} sx={{ height: { xs: "auto", md: "auto" } }}>
           <Card
             className="cardInput"
             sx={{
@@ -210,7 +210,7 @@ const VideoConvertion = () => {
         </Grid>
 
         {/* Upload Video Card */}
-        <Grid item xs={12} md={7.5} sx={{ height: { xs: "auto", md: "60vh" } }}>
+        <Grid item xs={12} md={7} sx={{ height: { xs: "auto", md: "60vh" } }}>
           <UploadVideo
             loading={isLoading}
             videoFile={videoFile}

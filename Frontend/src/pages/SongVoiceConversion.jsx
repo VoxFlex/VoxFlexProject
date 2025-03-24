@@ -99,7 +99,7 @@ const SongVoiceConversion = () => {
   };
 
   return (
-    <Box sx={{ mt: 5, mx: { xs: 2, md: 25 }, mb: 3 }}>
+    <Box sx={{ mt: 5, mx: { xs: 2, md: 15 }, mb: 3 }}>
       {/* Header Section */}
       <div 
         style={{

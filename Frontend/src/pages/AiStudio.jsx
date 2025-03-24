@@ -44,7 +44,7 @@ const AiStudio = () => {
     {
       id: "video-dubbing",
       icon: MusicNoteIcon,
-      title: "Video Dubbing",
+      title: "Video Convertion",
       description: "Dub videos with realistic AI voices",
       link: "/video-dubbing",
       category: "video",

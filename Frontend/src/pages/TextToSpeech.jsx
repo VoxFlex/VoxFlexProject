@@ -79,7 +79,7 @@ const TextToSpeech = () => {
   };
 
   return (
-    <Box sx={{ mt: 5, mx: { xs: 2, md: "12vw" }, mb: 8 }}>
+    <Box sx={{ mt: 5, mx: { xs: 2, md: 15 }, mb: 8 }}>
       {/* Header Section */}
       <Box
         sx={{

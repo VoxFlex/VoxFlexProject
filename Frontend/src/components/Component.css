@@ -16,3 +16,14 @@
   border-radius: 14px;
   border: 1px solid var(--black-38, rgba(0, 0, 0, 0.38));
 }
+
+.toolTopText {
+  background: linear-gradient(90deg, #007aff 0%, #e500ff 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-style: normal;
+  font-weight: 800;
+  line-height: normal;
+}
+

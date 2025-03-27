@@ -8,6 +8,8 @@ import {
   Card,
   CardContent,
 } from "@mui/material";
+import "../components/Component.css";
+import SectionFeatureInfo from "../components/SectionFeatureInfo";
 
 const Home = () => {
   return (
@@ -20,22 +22,19 @@ const Home = () => {
       }}
     >
       {/* Header Section */}
-      <Box
+      <Grid2
         sx={{
           display: "flex",
           paddingBlock: 5,
-          gap: 12,
+          gap: "3.1875rem",
           justifyContent: "center",
-          // flexDirection: { xs: "column-reverse", md: "row" }, // Adjust direction for smaller screens
-          flexDirection: { xs: "column-reverse", md: "column-reverse" }, // Adjust direction for smaller screens
+          flexDirection: "column",
           alignItems: "center",
         }}
       >
         {/* mainText container */}
         <Box
           sx={{
-            // textAlign: { xs: "center", md: "left" },
-            textAlign: { xs: "center", md: "center" },
             maxWidth: { xs: "100%", md: "50%" },
           }}
         >
@@ -44,12 +43,12 @@ const Home = () => {
             sx={{
               fontWeight: "bold",
               color: "#001F3E",
-              fontSize: { xs: "2.5rem", md: "3rem" },
+              // fontSize: { xs: "2.5rem", md: "3rem" },
             }}
             variant="h2"
           >
-            <span style={{ color: "#007AFF" }}>AI Powered</span>&nbsp;Video
-            <div>Translator</div>
+            <span style={{ color: "#007AFF" }}>AI Powered</span>
+            <div>Video Translator</div>
           </Typography>
 
           {/* mainText subtitle */}
@@ -57,26 +56,24 @@ const Home = () => {
             variant="subtitle1"
             sx={{
               marginBlock: 4,
-              color: "#334C65",
-              // textAlign: { xs: "center", md: "left" },
+              paddingX: 5,
+              color: "var(--black-80, #334C65)",
               textAlign: { xs: "center", md: "center" },
-              fontSize: "25px",
+              fontSize: "1.5625rem",
               marginLeft: { xs: 0, md: 1 },
+              lineHeight: "160%",
+              fontWeight: "500",
             }}
           >
-            AI Video Translation for a Global Audience.Translate a video with multi-languages with AI video translation.
+            AI Translation and Conversion for a Global Audience.Translate a
+            video with multi-languages.
           </Typography>
 
           {/* mainText button */}
           <Box
             sx={{
-              display: "flex",
-              flexDirection: { xs: "column", sm: "colum" }, // Stack buttons on small screens
-              // flexDirection: { xs: "column", sm: "row" }, // Stack buttons on small screens
-
-              gap: "1rem",
-              justifyContent: { xs: "center", md: "flex-start" },
-              marginBottom: "3rem",
+              alignItems: "center",
+              paddingX: "1",
             }}
           >
             <Button
@@ -86,38 +83,64 @@ const Home = () => {
               color="primary"
               sx={{
                 backgroundColor: "#007AFF",
+                borderRadius: "1.875rem",
               }}
             >
               Get Started
             </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              sx={{
-                backgroundColor: "#ffff",
-                color: "#007AFF",
-                borderColor: "#007AFF",
-                border: 1,
-              }}
-            >
-              Quick Guide
-            </Button>
           </Box>
         </Box>
-        <Box sx={{ maxWidth: { xs: "80%", md: "40%" }, textAlign: "center" }}>
+
+        <Box
+          sx={{
+            paddingX: 5,
+            maxWidth: { xs: "80%", md: "40%" },
+            textAlign: "center",
+          }}
+        >
           <img
             style={{ width: "100%", height: "auto" }}
             src="../../image/homeImage.png"
             alt="Landing Illustration"
           />
         </Box>
-      </Box>
+      </Grid2>
 
-      {/* Quick Guide Section */}
-      <div style={{ backgroundColor: "#fff", padding: "5rem" }}>
+      <Box
+        style={{
+          backgroundColor: "#fff",
+          padding: "2rem",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <Typography variant="h2" sx={{ fontWeight: "bold",marginTop:"2.5rem" }}>
+          Online AI video
+        </Typography>
+
         <Typography
-          variant="h4"
-          sx={{ fontWeight: "bold", marginBottom: "1rem" }}
+          className="toolTopText"
+          variant="h2"
+          sx={{
+            fontWeight: "bold",
+            marginBottom: "1rem",
+          }}
+        >
+          Toolkit
+        </Typography>
+        <SectionFeatureInfo
+          title="Speak to the World with AI-Powered Dubbing"
+          subtitle={`Effortlessly translate your videos into multiple languages with a single click.\nExpand your reach and engage global audiences like never before!`}
+          imgSrc="../../image/vdoTrans.png"
+          linkTo="/ai_studio"
+          buttonName="TRANSLATE VIDEO NOW"
+        />
+
+        {/* Quick Guide Title */}
+        <Typography
+          variant="h3"
+          sx={{ fontWeight: "bold", marginBottom: "0.5rem" }}
         >
           Quick Guide
         </Typography>
@@ -128,9 +151,14 @@ const Home = () => {
           Advanced AI-Powered Video Translator
         </Typography>
 
-        {/* Card Cont container */}
-
-        <Grid2 container spacing={3} justifyContent="center" gap={10}>
+        {/* Quick Guide Section */}
+        <Grid2
+          container
+          spacing={3}
+          justifyContent="center"
+          gap={10}
+          marginBottom={8}
+        >
           <Grid2 item xs={12} sm={6} md={4}>
             <Card
               sx={{
@@ -229,7 +257,32 @@ const Home = () => {
             </Card>
           </Grid2>
         </Grid2>
-      </div>
+        {/* Quick Guide Section */}
+
+        <SectionFeatureInfo
+          title="Voice Conversion"
+          subtitle="Transform your voice effortlessly! Use AI to convert your voice into different tones, famous voices, or even create a unique custom voice. Perfect for dubbing, content creation, and storytelling."
+          imgSrc="../../image/voice-conversion.png"
+          linkTo="/voice-converter"
+          buttonName="GENERATE NOW"
+        />
+
+        <SectionFeatureInfo
+          title="Song Voice Conversion"
+          subtitle="Unlock the power of AI for your music! Our platform allows you to convert song voices, transforming them into different styles, tones, or even famous voices. Plus, effortlessly translate your song lyrics into multiple languages while preserving the original melody and flow. Perfect for musicians, content creators, and anyone looking to reach a global audience with their music."
+          imgSrc="../../image/song-voice-conversion.png"
+          linkTo="/song-voice"
+          buttonName="SELECT YOUR SONG NOW"
+        />
+
+        <SectionFeatureInfo
+          title="Text to Speech"
+          subtitle="Effortlessly translate your videos into multiple languages with a single click. Expand your reach and engage global audiences like never before!"
+          imgSrc="../../image/text-to-speech.png"
+          linkTo="/text-speech"
+          buttonName="TRY IT NOW"
+        />
+      </Box>
     </Box>
   );
 };

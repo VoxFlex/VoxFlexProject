@@ -35,7 +35,7 @@ const About = () => {
     <>
       <Box
         sx={{
-          backgroundColor: "#F4F6F9",
+          // backgroundColor: "#F4F6F9",
           px: { xs: 2, sm: 4, md: 8 },
           pt: { xs: 4, sm: 6, md: 8 },
           marginTop: `calc(1vh - ${footerHeight}px)`,
@@ -44,7 +44,7 @@ const About = () => {
       >
         <Grid container spacing={4} alignItems="center">
           {/* Left Column: Headline */}
-          <Grid item xs={12} md={5}>
+          <Grid item xs={12} md={6}>
             <Typography
               variant="h3"
               fontWeight="bold"
@@ -62,7 +62,7 @@ const About = () => {
           </Grid>
 
           {/* Right Column: KU Logo + Description + Image */}
-          <Grid item xs={12} md={7}>
+          <Grid item xs={12} md={6}>
             {/* KU Logo + Description */}
             <Box
               sx={{
@@ -106,7 +106,7 @@ const About = () => {
               src={teamImage}
               alt="Team collaboration"
               sx={{
-                width: "60%",
+                width: "70%",
                 maxWidth: "500px",
                 height: "auto",
                 objectFit: "contain",

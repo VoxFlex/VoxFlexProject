@@ -133,7 +133,7 @@ const Home = () => {
           title="Speak to the World with AI-Powered Dubbing"
           subtitle={`Effortlessly translate your videos into multiple languages with a single click.\nExpand your reach and engage global audiences like never before!`}
           imgSrc="../../image/vdoTrans.png"
-          linkTo="/ai_studio"
+          linkTo="/video-translator"
           buttonName="TRANSLATE VIDEO NOW"
         />
 
@@ -262,7 +262,7 @@ const Home = () => {
         <SectionFeatureInfo
           title="Voice Conversion"
           subtitle="Transform your voice effortlessly! Use AI to convert your voice into different tones, famous voices, or even create a unique custom voice. Perfect for dubbing, content creation, and storytelling."
-          imgSrc="../../image/voice-conversion.png"
+          imgSrc="../../image/voice-conversion.svg"
           linkTo="/voice-converter"
           buttonName="GENERATE NOW"
         />

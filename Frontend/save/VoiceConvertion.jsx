@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DownloadIcon from "@mui/icons-material/Download";
-import RVCApiService from "../Frontend/src/Service/RVCApiService";
+import RVCApiService from "../src/Service/RVCApiService";
 
 const VoiceConversion = () => {
   const [models, setModels] = useState([]);

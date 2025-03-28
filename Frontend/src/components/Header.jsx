@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-  // อัพเดตขนาดหน้าจอเมื่อมีการเปลี่ยนแปลง
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
-
-    // ลบ event listener เมื่อ component ถูก unmount
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
@@ -25,76 +22,192 @@ const Header = () => {
         padding: "1rem 0",
         width: "100%",
         boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.06)",
-        position: "sticky", // ใช้ sticky position เพื่อให้ Navbar ติดตามเมื่อ scroll
-        top: 0, // ระบุให้ติดอยู่ด้านบนสุด
-        zIndex: 1000, // เพิ่มความสำคัญให้ Navbar อยู่เหนือ content อื่น ๆ
+        position: "sticky",
+        top: 0,
+        zIndex: 1000,
       }}
     >
       <nav
         style={{
           display: "flex",
-          justifyContent: "center", // จัดให้อยู่ตรงกลางทั้งลิงก์
+          justifyContent: "center",
           alignItems: "center",
           height: "3rem",
-          position: "relative", // เพื่อให้ logo ใช้ position:absolute ได้
-          justifyContent: windowWidth < 600 ? "flex-end" : "center", // ใช้ flex-end หากหน้าจอเล็ก
+          position: "relative",
+          justifyContent: windowWidth < 600 ? "flex-end" : "center",
         }}
       >
         {/* โลโก้ */}
         <img
-          src="../../image/voxflex_icon.svg"
+          src="../../image/voxflex_icon.png"
           alt="VoxFlex Icon"
           style={{
-            width: windowWidth >= 600 ? "50%" : "28%", // เปลี่ยนขนาดตามความกว้างหน้าจอ
-            maxWidth: "180px", // จำกัดขนาดสูงสุด
-            height: "auto", // ให้คงอัตราส่วนภาพ
-            position: "absolute", // แยกโลโก้ออกจากการจัดวาง
-            left: "2rem", // ตำแหน่งห่างจากขอบซ้าย
+            width: windowWidth >= 600 ? "50%" : "28%",
+            maxWidth: "180px",
+            height: "auto",
+            position: "absolute",
+            left: "2rem",
             top: "50%",
-            transform: "translateY(-50%)", // จัดให้อยู่ตรงกลางแนวตั้ง
+            transform: "translateY(-50%)",
           }}
         />
 
-        {/* ลิงก์สำหรับ Desktop */}
+        {/* เมนู Desktop */}
         {windowWidth >= 600 ? (
           <div
             style={{
               display: "flex",
-              gap: "3rem", // ช่องว่างระหว่างลิงก์
+              alignItems: "center",
+              gap: "3rem",
               justifyContent: "center",
               fontSize: "1rem",
+              position: "relative",
             }}
           >
-            <Link
+            {/* 
+              1) NavLink ไปยัง Home
+              2) ใช้ style={({ isActive }) => ({ color: isActive ? "#007bff" : "#333" })} 
+                 เพื่อเปลี่ยนสีตาม active state 
+            */}
+            <NavLink
               to="/"
-              style={{
-                color: "#333",
+              end  // สำหรับเส้นทาง / ให้ใช้ end เพื่อไม่ให้ชนกับเส้นทางอื่นที่ขึ้นต้นด้วย /
+              style={({ isActive }) => ({
+                color: isActive ? "#007bff" : "#333",
                 textDecoration: "none",
-              }}
+              })}
             >
               Home
-            </Link>
-            <Link
-              to="/ai_studio"
+            </NavLink>
+
+            {/* Ai Studio + Dropdown ครอบใน div เดียว */}
+            <div
               style={{
-                color: "#333",
-                textDecoration: "none",
+                position: "relative",
+                display: "inline-block",
               }}
+              onMouseEnter={() => setIsDropdownOpen(true)}
+              onMouseLeave={() => setIsDropdownOpen(false)}
             >
-              Ai Studio
-            </Link>
-            <Link
+              {/*
+                หากต้องการให้ Ai Studio Active ทั้ง /ai_studio และ sub-route ต่าง ๆ เช่น /ai_studio/...
+                ให้เอา end={false} เพื่อ match path ลูกด้วย
+              */}
+              <NavLink
+                to="/ai_studio"
+                end={false}
+                style={({ isActive }) => ({
+                  color: isActive ? "#007bff" : "#333",
+                  textDecoration: "none",
+                  padding: "0.5rem 0.75rem",
+                  display: "inline-block",
+                })}
+              >
+                Ai Studio
+              </NavLink>
+
+              {/* Dropdown */}
+              {isDropdownOpen && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "100%",
+                    left: 0,
+                    backgroundColor: "#fff",
+                    boxShadow: "0 2px 4px rgba(0,0,0,0.15)",
+                    borderRadius: "4px",
+                    padding: "0.5rem 0",
+                    zIndex: 10,
+                    minWidth: "180px",
+                  }}
+                >
+                  {/* 
+                    เมนูย่อยก็เปลี่ยนเป็น NavLink ได้เช่นกัน 
+                    แต่หลายคนอาจให้แค่ clickable เฉย ๆ ก็ได้
+                  */}
+                  <NavLink
+                    to="/video-translator"
+                    style={({ isActive }) => ({
+                      display: "block",
+                      padding: "0.5rem 1rem",
+                      color: isActive ? "#007bff" : "#333",
+                      textDecoration: "none",
+                      whiteSpace: "nowrap",
+                    })}
+                  >
+                    Video Translator
+                  </NavLink>
+                  <NavLink
+                    to="/video-dubbing"
+                    style={({ isActive }) => ({
+                      display: "block",
+                      padding: "0.5rem 1rem",
+                      color: isActive ? "#007bff" : "#333",
+                      textDecoration: "none",
+                    })}
+                  >
+                    Video Dubbing
+                  </NavLink>
+                  <NavLink
+                    to="/voice-converter"
+                    style={({ isActive }) => ({
+                      display: "block",
+                      padding: "0.5rem 1rem",
+                      color: isActive ? "#007bff" : "#333",
+                      textDecoration: "none",
+                    })}
+                  >
+                    Voice Converter
+                  </NavLink>
+                  <NavLink
+                    to="/song-voice"
+                    style={({ isActive }) => ({
+                      display: "block",
+                      padding: "0.5rem 1rem",
+                      color: isActive ? "#007bff" : "#333",
+                      textDecoration: "none",
+                    })}
+                  >
+                    Song Voice
+                  </NavLink>
+                  <NavLink
+                    to="/audio-translation"
+                    style={({ isActive }) => ({
+                      display: "block",
+                      padding: "0.5rem 1rem",
+                      color: isActive ? "#007bff" : "#333",
+                      textDecoration: "none",
+                    })}
+                  >
+                    Audio Translation
+                  </NavLink>
+                  <NavLink
+                    to="/text-speech"
+                    style={({ isActive }) => ({
+                      display: "block",
+                      padding: "0.5rem 1rem",
+                      color: isActive ? "#007bff" : "#333",
+                      textDecoration: "none",
+                    })}
+                  >
+                    Text to Speech
+                  </NavLink>
+                </div>
+              )}
+            </div>
+
+            <NavLink
               to="/about"
-              style={{
-                color: "#333",
+              style={({ isActive }) => ({
+                color: isActive ? "#007bff" : "#333",
                 textDecoration: "none",
-              }}
+              })}
             >
               About
-            </Link>
+            </NavLink>
           </div>
         ) : (
-          // ปุ่ม Dropdown สำหรับหน้าจอขนาดเล็ก
+          // ปุ่มเมนู Hamburger บนจอเล็ก
           <button
             onClick={toggleDropdown}
             style={{
@@ -110,7 +223,7 @@ const Header = () => {
         )}
       </nav>
 
-      {/* เมนู Dropdown */}
+      {/* เมนู Dropdown (Hamburger) สำหรับ mobile */}
       {isDropdownOpen && windowWidth < 400 && (
         <div
           style={{
@@ -121,42 +234,44 @@ const Header = () => {
             borderRadius: "5px",
           }}
         >
-          <Link
+          <NavLink
             to="/"
+            end
             onClick={() => setIsDropdownOpen(false)}
-            style={{
+            style={({ isActive }) => ({
               margin: "5px 0",
-              color: "white",
+              color: isActive ? "#007bff" : "#fff",
               textDecoration: "none",
               textAlign: "center",
-            }}
+            })}
           >
             Home
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             to="/ai_studio"
+            end={false}
             onClick={() => setIsDropdownOpen(false)}
-            style={{
+            style={({ isActive }) => ({
               margin: "5px 0",
-              color: "white",
+              color: isActive ? "#007bff" : "#fff",
               textDecoration: "none",
               textAlign: "center",
-            }}
+            })}
           >
-            AI Studio
-          </Link>
-          <Link
+            Ai Studio
+          </NavLink>
+          <NavLink
             to="/about"
             onClick={() => setIsDropdownOpen(false)}
-            style={{
+            style={({ isActive }) => ({
               margin: "5px 0",
-              color: "white",
+              color: isActive ? "#007bff" : "#fff",
               textDecoration: "none",
               textAlign: "center",
-            }}
+            })}
           >
             About
-          </Link>
+          </NavLink>
         </div>
       )}
     </header>

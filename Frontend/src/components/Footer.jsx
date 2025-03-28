@@ -1,4 +1,5 @@
 import React from "react";
+import { useLocation } from "react-router-dom";
 import {
   Facebook,
   Twitter,
@@ -8,32 +9,33 @@ import {
 } from "@mui/icons-material";
 
 const Footer = () => {
+  const location = useLocation();
+  const isAboutPage = location.pathname === "/about";
+
+  if (isAboutPage) {
+    return <></>;
+  }
+
+  // ✅ แบบที่ 1: Footer Default สำหรับทุก path ยกเว้น /about
   return (
     <footer
       style={{
-        background: "#263238", // Dark background color
+        background: "#263238",
         color: "white",
         textAlign: "start",
-        padding: "0.5rem 2rem", // Add padding for spacing
-        display: "flex", // Flexbox for layout
-        justifyContent: "space-between", // Space between copyright and icons
-        alignItems: "center", // Vertically align items
-        position: "relative" /* Ensures it stays above other content */
-
+        padding: "0.5rem 2rem",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
       }}
     >
-      <p>&copy; 2025 VoxFlex App. All rights reserved.</p>
-      <div
-        style={{
-          display: "flex",
-          gap: "1rem", // Space between icons
-        }}
-      >
+      <p>&copy; 2025 VoxFlex. All rights reserved.</p>
+      <div style={{ display: "flex", gap: "1rem" }}>
         <a
           href="https://facebook.com"
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: "white", textDecoration: "none" }}
+          style={{ color: "white" }}
         >
           <Facebook />
         </a>
@@ -41,7 +43,7 @@ const Footer = () => {
           href="https://twitter.com"
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: "white", textDecoration: "none" }}
+          style={{ color: "white" }}
         >
           <Twitter />
         </a>
@@ -49,7 +51,7 @@ const Footer = () => {
           href="https://instagram.com"
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: "white", textDecoration: "none" }}
+          style={{ color: "white" }}
         >
           <Instagram />
         </a>
@@ -57,7 +59,7 @@ const Footer = () => {
           href="https://github.com"
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: "white", textDecoration: "none" }}
+          style={{ color: "white" }}
         >
           <GitHub />
         </a>
@@ -65,7 +67,7 @@ const Footer = () => {
           href="https://linkedin.com"
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: "white", textDecoration: "none" }}
+          style={{ color: "white" }}
         >
           <LinkedIn />
         </a>

@@ -1,6 +1,38 @@
 # VoxFlex
 
-VoxFlex is a cutting-edge platform designed to make multimedia content accessible across multiple languages through advanced AI-powered tools. The platform focuses on delivering synchronized, translated, and lip-synced audio and video, offering an immersive and inclusive multimedia experience.
+VoxFlex is an advanced platform designed to make multimedia content accessible across languages using AI-driven voice, audio, and video processing. It combines **machine translation**, **voice conversion**, **speech generation**, and **video enhancement** into a seamless system.
+* * * * *
+
+🚀 Overview
+-----------
+
+-   Translate and synthesize voices in videos or audio into any language
+
+-   Convert vocals using **RVC voice models**
+
+-   Generate high-quality text-to-speech using **OpenAI TTS**
+
+-   Handle full video processing including voice overlay and lip sync
+
+* * * * *
+
+🧠 Architecture
+---------------
+
+### Main Components:
+
+-   **Frontend**: Built with **React.js**, for a responsive and intuitive UI
+
+-   **Main Server**: Built with **FastAPI**, acts as the orchestrator between client, RVC Server, and external APIs
+
+-   **RVC Server**: A separate FastAPI-based service dedicated to running **RVC inference**, audio separation, and merging
+
+-   **External APIs**: Integrated with **Google Translate**, **OpenAI ChatGPT**, and **OpenAI TTS**
+
+* * * * *
+
+
+
 ## Screenshots
 ### Homepage
 ![homepage](https://github.com/user-attachments/assets/4911451a-7515-4e5f-8710-0dbf21bb9de0)
@@ -13,25 +45,111 @@ VoxFlex is a cutting-edge platform designed to make multimedia content accessibl
 ![image](https://github.com/user-attachments/assets/487d0d60-e5c9-49f1-83ca-4f911d729ff8)
  
 
-## Features
-- **Speech-to-Text:** Converts audio to text accurately using Whisper by OpenAI.
-- **Text Translation:** Provides seamless multilingual translation using Deep Translator (Google Translate).
-- **Voice Synthesis:** Generates high-quality, natural-sounding voiceovers with RVC WebUI.
-- **Lip Synchronization:** Synchronizes voiceovers with video content using Wav2Lip for realistic visual experiences.
-- **User-Friendly Interface:** Interactive and responsive UI built with React.js for ease of use.
+🧹 Features
+-----------
 
-## Technology Stack
-- **Programming Language:** Python
-- **Web Framework:** FastAPI for building and managing backend APIs
-- **Frontend:** HTML, CSS, JavaScript, React.js
+### ✅ Voice Conversion
 
-### AI implementation
-- **Speech-to-Text:** Whisper by OpenAI
-- **Text Translation:** Deep Translator (Google Translate)
-- **Voice Synthesis:** RVC WebUI
-- **Lip Synchronization:** Wav2Lip
+-   Converts speaker's voice to sound like another speaker using **RVC inference**
+
+-   Used in voice dubbing or character voice transformation
+
+-   Fully handled by **RVC Server**
+
+### ✅ Song Conversion
+
+-   Splits vocals and background music using **Spleeter**
+
+-   Converts vocals via **RVC** and re-merges them with the background
+
+-   Does not require any external APIs
+
+### ✅ Audio Translation
+
+-   Extracts and transcribes speech using **WhisperX**
+
+-   Translates using **Google Translate** with fallback and refinement using **ChatGPT (GPT-4o)**
+
+-   Regenerates speech with **OpenAI TTS**
+
+-   Merges the translated voice as a standalone audio response
+
+### ✅ Video Conversion
+
+-   Extracts audio from video using **ffmpeg**
+
+-   Converts audio using **RVC voice model**
+
+-   Recombines the new audio back into the original video
+
+-   Entirely processed using the **RVC Server** without external API calls
+
+### ✅ Video Translation
+
+-   Extracts audio ➔ transcribes ➔ translates ➔ regenerates audio using **OpenAI TTS**
+
+-   Uses **Google Translate + GPT-4o** for text translation
+
+-   Merges translated voice back with video to create fully localized content
+
+### ✅ Text-to-Speech
+
+-   Input any text, define language and speaker model
+
+-   Uses **OpenAI TTS** to generate high-quality, natural speech
+
+### ✅ Model Management
+
+-   Upload `.zip` files containing `.pth` models for use in RVC
+
+-   Dynamically switch active model for RVC-based tasks
+
+* * * * *
+
+🧪 Technology Stack
+-------------------
+
+### 🖥️ Frontend
+
+-   **React.js** with Vite
+
+-   **Axios** for API calls
+
+-   **MUI** for UI styling
+
+### 🧠 Backend
+
+-   **FastAPI** (for both Main Server and RVC Server)
+
+-   **Python** for all core logic
+
+-   **pydub**, **ffmpeg**, **openai**, **whisperx**, **deep_translator**, **torch**
+
+### 📦 AI Models
+
+-   **RVC (Retrieval-based Voice Conversion)**
+
+-   **OpenAI WhisperX** for transcription
+
+-   **OpenAI TTS** (e.g., Alloy, Nova, Onyx)
+
+-   **ChatGPT (GPT-4o)** for translation refinement
+
+-   **Google Translate API**
+
+### 🧱 System Structure
+
+-   `frontend/` - React-based UI
+
+-   `main-server/` - Orchestrates translation, TTS, and video/audio pipelines
+
+-   `rvc-server/` - Dedicated service for voice model inference
+
 ### Version Control
 - **Version Control:** Git (hosted on GitHub) code collaboration
+
+* * * * *
+
 
 ## Installation
 

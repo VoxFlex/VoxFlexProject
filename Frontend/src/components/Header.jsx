@@ -23,8 +23,8 @@ const Header = () => {
         width: "100%",
         boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.06)",
         position: "sticky",
-        top: 0,
         zIndex: 1000,
+        top: 0,
       }}
     >
       <nav
@@ -71,7 +71,7 @@ const Header = () => {
             */}
             <NavLink
               to="/"
-              end  // สำหรับเส้นทาง / ให้ใช้ end เพื่อไม่ให้ชนกับเส้นทางอื่นที่ขึ้นต้นด้วย /
+              end // สำหรับเส้นทาง / ให้ใช้ end เพื่อไม่ให้ชนกับเส้นทางอื่นที่ขึ้นต้นด้วย /
               style={({ isActive }) => ({
                 color: isActive ? "#007bff" : "#333",
                 textDecoration: "none",
@@ -229,8 +229,10 @@ const Header = () => {
           style={{
             display: "flex",
             flexDirection: "column",
-            backgroundColor: "#444",
+            backgroundColor: "rgba(40, 38, 38, 0.88)",
             margin: "10px",
+            padding: "5px",
+            gap: 2,
             borderRadius: "5px",
           }}
         >

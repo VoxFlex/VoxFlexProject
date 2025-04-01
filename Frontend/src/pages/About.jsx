@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Box, Typography, Grid , List, ListItem } from "@mui/material";
+import { Box, Typography, Grid, List, ListItem } from "@mui/material";
 import {
   Facebook,
   Twitter,
@@ -12,37 +12,30 @@ const kuLogo = "../../image/ku_logo.svg";
 const teamImage = "../../image/team_illustration.png";
 
 const About = () => {
-  const footerRef = useRef(null);
-  const [footerHeight, setFooterHeight] = useState(0);
 
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
   useEffect(() => {
-    if (footerRef.current) {
-      setFooterHeight(footerRef.current.offsetHeight);
+    const handleResizeWidth = () => setWindowWidth(window.innerWidth);
+    const handleResizeHeight = () => setWindowHeight(window.innerHeight);
+    window.addEventListener("resize", handleResizeWidth);
+    window.addEventListener("resize", handleResizeHeight);
+    return () => {
+      window.removeEventListener("resize", handleResizeWidth);
+      window.removeEventListener("resize", handleResizeHeight);
     }
-
-    // ถ้า footer resize ในอนาคต
-    const handleResize = () => {
-      if (footerRef.current) {
-        setFooterHeight(footerRef.current.offsetHeight);
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
   }, []);
-
+  console.log(windowWidth, windowHeight);
   return (
     <>
       <Box
         sx={{
-          // backgroundColor: "#F4F6F9",
+          // backgroundColor: "rgba(193, 219, 227, 0.2)   ",
           px: { xs: 2, sm: 4, md: 8 },
           pt: { xs: 4, sm: 6, md: 8 },
-          marginTop: `calc(1vh - ${footerHeight}px)`,
-          minHeight: `calc(40vh - ${footerHeight}px)`,
         }}
       >
-        <Grid container spacing={4} alignItems="center">
+        <Grid container spacing={3} alignItems="center" sx={{  minHeight: `calc(0.6 * ${windowHeight}px)`  }}>
           {/* Left Column: Headline */}
           <Grid item xs={12} md={6}>
             <Typography
@@ -50,9 +43,10 @@ const About = () => {
               fontWeight="bold"
               sx={{
                 color: "#0A2540",
-                lineHeight: 1.4,
+                lineHeight: 1.5,
                 mb: 2,
                 textAlign: { xs: "center", md: "left" },
+                fontSize: { xs: 0, sm:  `calc(0.041 * ${windowWidth}px)` },
               }}
             >
               Bringing Your Videos <br />
@@ -68,9 +62,9 @@ const About = () => {
               sx={{
                 display: "flex",
                 alignItems: "flex-start",
-                gap: 2,
+                gap: 3,
+                minHeight: `calc(0.35 * ${windowHeight}px)`,
                 flexDirection: { xs: "column", sm: "row" },
-                mb: 3,
               }}
             >
               <Box
@@ -78,7 +72,7 @@ const About = () => {
                 src={kuLogo}
                 alt="Kasetsart University"
                 sx={{
-                  width: { xs: 60, sm: 70 },
+                  width: { xs: `calc(0.09 * ${windowHeight}px)`, sm: `calc(0.11 * ${windowWidth}px)` },
                   height: "auto",
                   alignSelf: { xs: "center", sm: "flex-start" },
                 }}
@@ -88,7 +82,7 @@ const About = () => {
                 sx={{
                   color: "#444",
                   textAlign: { xs: "center", sm: "left" },
-                  maxWidth: "100%",
+                  fontSize: { xs: `calc(0.015 * ${windowHeight}px)`, sm: `calc(0.012 * ${windowWidth}px)` },
                 }}
               >
                 VoxFlex is a proud outcome of the 01219499-60 Innovative
@@ -106,12 +100,11 @@ const About = () => {
               src={teamImage}
               alt="Team collaboration"
               sx={{
-                width: "70%",
-                maxWidth: "500px",
+                width: { xs: "100%", sm: "80%", md: "70%" },
                 height: "auto",
                 objectFit: "contain",
                 display: "block",
-                mx: "auto",
+                // mx: "auto",
               }}
             />
           </Grid>
@@ -124,9 +117,10 @@ const About = () => {
           px: { xs: 3, md: 6 },
           pt: 6,
           pb: 3,
-          mt: 0,
+          // mt: 0,
           // minHeight: "calc(100vh - 400px)",
-          minHeight:"48vh"
+          // minHeight: "48vh",
+          minHeight: `calc(0.3 * ${windowHeight}px)`,
         }}
       >
         {/* 2-column grid */}
